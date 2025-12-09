@@ -806,7 +806,6 @@
             }
         }
         
-        // Update date time every minute
         updateDateTime();
         setInterval(updateDateTime, 60000);
     </script>

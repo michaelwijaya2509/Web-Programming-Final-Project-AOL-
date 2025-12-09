@@ -776,7 +776,6 @@
             });
         }
 
-        // Simulate court status changes every 30 seconds
         setInterval(simulateCourtStatus, 30000);
 
         // Real-time booking counter
@@ -811,7 +810,6 @@
             }
         }
 
-        // Update every second for live feel
         setInterval(updateLiveDateTime, 1000);
         updateLiveDateTime();
 
@@ -848,10 +846,8 @@
         // Auto-refresh data every 2 minutes
         setInterval(() => {
             console.log('Refreshing dashboard data...');
-            // In real implementation, fetch new data via AJAX
         }, 120000);
 
-        // Export functionality
         document.querySelector('.btn-light.rounded-pill')?.addEventListener('click', function(e) {
             e.preventDefault();
             this.innerHTML = '<span class="loading-spinner"></span> Generating...';
