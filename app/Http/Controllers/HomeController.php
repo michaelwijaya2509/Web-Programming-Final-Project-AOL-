@@ -36,6 +36,6 @@ class HomeController extends Controller
         $courts = $query->latest()->get();
 
         // lempar ke home
-        return view('home', compact($courts));
+        return view('home.index', ['courts'=>$courts]);
     }
 }
