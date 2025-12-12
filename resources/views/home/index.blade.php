@@ -46,35 +46,35 @@
         </div>
     </div>
 
-    <div class="relative -mt-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20 z-10">
         <div
             class="ayo-red rounded-lg shadow-lg p-4 md:p-6 flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0 text-white">
 
             <div class="flex-1 w-full md:border-r border-red-700 px-4">
-                <label class="block text-xs font-semibold uppercase tracking-wide opacity-80 mb-1">Aktivitas</label>
+                <label class="block text-xs font-semibold uppercase tracking-wide opacity-80 mb-1 text-orange-500">Aktivitas</label>
                 <div class="flex items-center justify-between cursor-pointer">
-                    <span class="font-bold text-lg">Cari Lapangan</span> <i class="fas fa-chevron-down text-sm"></i>
+                    <span class="font-bold text-lg text-orange-500">Cari Lapangan</span> <i class="fas fa-chevron-down text-sm"></i>
                 </div>
             </div>
 
             <div class="flex-1 w-full md:border-r border-red-700 px-4">
-                <label class="block text-xs font-semibold uppercase tracking-wide opacity-80 mb-1">Lokasi</label>
+                <label class="block text-xs font-semibold uppercase tracking-wide opacity-80 mb-1 text-orange-500">Lokasi</label>
                 <div class="flex items-center justify-between cursor-pointer">
-                    <span class="font-bold text-lg">Jakarta Selatan</span>
+                    <span class="font-bold text-lg text-orange-500">Jakarta Selatan</span>
                     <i class="fas fa-map-marker-alt text-sm"></i>
                 </div>
             </div>
 
             <div class="flex-1 w-full px-4">
-                <label class="block text-xs font-semibold uppercase tracking-wide opacity-80 mb-1">Cabang Olahraga</label>
+                <label class="block text-xs font-semibold uppercase tracking-wide opacity-80 mb-1 text-orange-500">Cabang Olahraga</label>
                 <div class="flex items-center justify-between cursor-pointer">
-                    <span class="font-bold text-lg">Futsal / Mini Soccer</span>
+                    <span class="font-bold text-lg text-orange-500">Futsal / Mini Soccer</span>
                     <i class="fas fa-futbol text-sm"></i>
                 </div>
             </div>
 
             <div class="pl-4">
-                <button class="bg-white text-ayo-red px-8 py-3 rounded font-bold hover:bg-gray-100 transition shadow-md">
+                <button class="bg-white text-ayo-red px-8 py-3 rounded font-bold hover:bg-gray-100 text-orange-500 transition shadow-md">
                     Temukan <i class="fas fa-arrow-right ml-2"></i>
                 </button>
             </div>
