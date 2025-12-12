@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class ScoreboardController extends Controller
 {
@@ -25,13 +26,18 @@ class ScoreboardController extends Controller
         return redirect('/scoreboard');
     }
 
-    // setup game type + mode
+    // setup game type + mode - GET
     public function setupGame()
     {
-        return view('scoreboard.setup');
+        $players = session('players', []);
+        if (count($players) < 2) {
+            return redirect('/scoreboard')->with('error', 'Minimal 2 pemain diperlukan.');
+        }
+        
+        return view('scoreboard.setup', compact('players'));
     }
 
-    // save setup game
+    // save setup game - POST
     public function saveSetup(Request $request)
     {
         $request->validate([
@@ -39,10 +45,16 @@ class ScoreboardController extends Controller
             'mode' => 'required|in:single,double'
         ]);
 
+        $players = session('players', []);
+        
+        // Validasi jumlah pemain untuk double
+        if ($request->mode === 'double' && count($players) < 4) {
+            return redirect('/scoreboard/setup')->with('error', 'Mode double memerlukan minimal 4 pemain.');
+        }
+
         session([
             'game_type' => $request->game_type,
             'mode' => $request->mode,
-            // reset matches & current match state
             'current_match' => null,
             'matches' => session('matches', []),
         ]);
@@ -51,75 +63,165 @@ class ScoreboardController extends Controller
     }
 
     // prepare a new match (smart shuffle + init rules state)
-    public function match()
-    {
-        $players = session('players', []);
-        if (count($players) < 2) {
-            return redirect('/scoreboard')->with('error', 'Butuh minimal 2 pemain.');
-        }
+    // public function match()
+    // {
+    //     $players = session('players', []);
+    //     if (count($players) < 2) {
+    //         return redirect('/scoreboard')->with('error', 'Butuh minimal 2 pemain.');
+    //     }
 
-        // shuffle but keep original order in session('players') for leaderboard tiebreaker
-        $shuffled = $players;
-        shuffle($shuffled);
+    //     // Check if there's an active match
+    //     $current = session('current_match');
+    //     if ($current && !isset($current['winner'])) {
+    //         // Continue existing match
+    //         return view('scoreboard.match', [
+    //             'teamA' => $current['teamA'],
+    //             'teamB' => $current['teamB'],
+    //             'current' => $current
+    //         ]);
+    //     }
 
-        $mode = session('mode', 'single');
-        $game_type = session('game_type', 'badminton');
+    //     // Create new match
+    //     $shuffled = $players;
+    //     shuffle($shuffled);
 
-        // build teams based on mode
-        if ($mode === 'single') {
-            // take first two players
-            $teamA = [$shuffled[0]];
-            $teamB = [$shuffled[1] ?? null];
-        } else {
-            // double: need at least 4 players; if less, fallback to single for remaining
-            $teamA = [$shuffled[0], $shuffled[1] ?? null];
-            $teamB = [$shuffled[2] ?? null, $shuffled[3] ?? null];
-        }
+    //     $mode = session('mode', 'single');
+    //     $game_type = session('game_type', 'badminton');
 
-        // initialize current match structure depending on game type
-        $current = [
-            'teamA' => array_values(array_filter($teamA)),
-            'teamB' => array_values(array_filter($teamB)),
-            'pointsA' => 0,    // generic point counter (interpretation depends on game_type)
-            'pointsB' => 0,
-            'game_type' => $game_type,
-            // badminton: points are rally points to 21
-            // tennis: points are 0/15/30/40/adv tracked via helper
-            // padel: we track games_in_set and tiebreak state below
-        ];
+    //     // build teams based on mode
+    //     if ($mode === 'single') {
+    //         $teamA = [$shuffled[0]];
+    //         $teamB = [$shuffled[1] ?? null];
+    //     } else {
+    //         $teamA = [$shuffled[0], $shuffled[1] ?? null];
+    //         $teamB = [$shuffled[2] ?? null, $shuffled[3] ?? null];
+    //     }
 
-        if ($game_type === 'padel') {
-            // padel uses sets and games
-            $current['sets'] = [
-                'A' => [0, 0, 0], // games won in set1,set2,set3
-                'B' => [0, 0, 0],
-            ];
-            $current['current_set_index'] = 0; // 0-based index
-            $current['in_tiebreak'] = false;
-            // tiebreak points if in_tiebreak true
-            $current['tiebreak_points'] = ['A' => 0, 'B' => 0];
-            $current['best_of_sets'] = 3; // first to 2 sets
-        }
+    //     // initialize current match structure depending on game type
+    //     $current = [
+    //         'teamA' => array_values(array_filter($teamA)),
+    //         'teamB' => array_values(array_filter($teamB)),
+    //         'pointsA' => 0,
+    //         'pointsB' => 0,
+    //         'game_type' => $game_type,
+    //         'mode' => $mode,
+    //         'winner' => null,
+    //         'finished' => false,
+    //         'started_at' => now()->toDateTimeString(),
+    //         'started_timestamp' => now()->timestamp, // Untuk perhitungan durasi
+    //     ];
 
-        if ($game_type === 'tennis') {
-            // tennis: store score state as strings for display and a small state for advantage/deuce
-            $current['tennis'] = [
-                'scoreA' => 0, // number of points in current game (0,1,2,3 correspond to 0,15,30,40)
-                'scoreB' => 0,
-                'adv' => null // 'A'|'B' or null
-            ];
-            // For simplicity we do single game per "match" here; can be extended to games/sets
-        }
+    //     if ($game_type === 'padel') {
+    //         $current['sets'] = [
+    //             'A' => [0, 0, 0],
+    //             'B' => [0, 0, 0],
+    //         ];
+    //         $current['current_set_index'] = 0;
+    //         $current['in_tiebreak'] = false;
+    //         $current['tiebreak_points'] = ['A' => 0, 'B' => 0];
+    //         $current['best_of_sets'] = 3;
+    //     }
 
-        // save current match to session
-        session(['current_match' => $current]);
+    //     if ($game_type === 'tennis') {
+    //         $current['tennis'] = [
+    //             'scoreA' => 0,
+    //             'scoreB' => 0,
+    //             'adv' => null,
+    //             'gamesA' => 0,
+    //             'gamesB' => 0,
+    //             'setsA' => 0,
+    //             'setsB' => 0,
+    //         ];
+    //     }
 
+    //     session(['current_match' => $current]);
+
+    //     return view('scoreboard.match', [
+    //         'teamA' => $current['teamA'],
+    //         'teamB' => $current['teamB'],
+    //         'current' => $current
+    //     ]);
+    // }
+    // prepare a new match (smart shuffle + init rules state)
+public function match()
+{
+    $players = session('players', []);
+    if (count($players) < 2) {
+        return redirect('/scoreboard')->with('error', 'Butuh minimal 2 pemain.');
+    }
+
+    // Check if there's an active match
+    $current = session('current_match');
+    if ($current && !isset($current['winner'])) {
+        // Continue existing match - JANGAN reset timer
         return view('scoreboard.match', [
             'teamA' => $current['teamA'],
             'teamB' => $current['teamB'],
             'current' => $current
         ]);
     }
+
+    // Create new match - RESET timer
+    $shuffled = $players;
+    shuffle($shuffled);
+
+    $mode = session('mode', 'single');
+    $game_type = session('game_type', 'badminton');
+
+    // build teams based on mode
+    if ($mode === 'single') {
+        $teamA = [$shuffled[0]];
+        $teamB = [$shuffled[1] ?? null];
+    } else {
+        $teamA = [$shuffled[0], $shuffled[1] ?? null];
+        $teamB = [$shuffled[2] ?? null, $shuffled[3] ?? null];
+    }
+
+    // initialize current match structure depending on game type
+    $current = [
+        'teamA' => array_values(array_filter($teamA)),
+        'teamB' => array_values(array_filter($teamB)),
+        'pointsA' => 0,
+        'pointsB' => 0,
+        'game_type' => $game_type,
+        'mode' => $mode,
+        'winner' => null,
+        'finished' => false,
+        'started_at' => now()->toDateTimeString(),
+        'started_timestamp' => now()->timestamp, // TIMESTAMP SEKARANG
+    ];
+
+    if ($game_type === 'padel') {
+        $current['sets'] = [
+            'A' => [0, 0, 0],
+            'B' => [0, 0, 0],
+        ];
+        $current['current_set_index'] = 0;
+        $current['in_tiebreak'] = false;
+        $current['tiebreak_points'] = ['A' => 0, 'B' => 0];
+        $current['best_of_sets'] = 3;
+    }
+
+    if ($game_type === 'tennis') {
+        $current['tennis'] = [
+            'scoreA' => 0,
+            'scoreB' => 0,
+            'adv' => null,
+            'gamesA' => 0,
+            'gamesB' => 0,
+            'setsA' => 0,
+            'setsB' => 0,
+        ];
+    }
+
+    session(['current_match' => $current]);
+
+    return view('scoreboard.match', [
+        'teamA' => $current['teamA'],
+        'teamB' => $current['teamB'],
+        'current' => $current
+    ]);
+}
 
     // route to add a point to the current match, $team is 'A' or 'B'
     public function addPoint(Request $request)
@@ -128,9 +230,12 @@ class ScoreboardController extends Controller
 
         $current = session('current_match');
         if (!$current) return redirect('/scoreboard')->with('error', 'Tidak ada match aktif.');
+        
+        if ($current['finished'] || isset($current['winner'])) {
+            return redirect('/scoreboard/match')->with('error', 'Match sudah selesai.');
+        }
 
         $team = $request->team;
-        $opponent = $team === 'A' ? 'B' : 'A';
         $game_type = $current['game_type'];
 
         if ($game_type === 'badminton') {
@@ -141,56 +246,109 @@ class ScoreboardController extends Controller
             $this->padelPoint($current, $team);
         }
 
-        session(['current_match' => $current]);
+        // Check if game is finished (winner detected)
+        if (isset($current['winner'])) {
+            $current['finished'] = true;
+            $current['finished_at'] = now()->toDateTimeString();
+            $current['finished_timestamp'] = now()->timestamp;
+            
+            // Auto-process match finish
+            $this->processMatchFinish($current);
+            
+            // Redirect langsung ke leaderboard
+            return redirect('/scoreboard/leaderboard')->with('success', 'Pertandingan selesai! Pemenang: Team ' . $current['winner']);
+        }
 
+        session(['current_match' => $current]);
         return redirect('/scoreboard/match');
     }
 
-    // finalise the current match (determine winner, update scores, clear current match)
-    public function finishMatch()
+    // manual finish match
+    public function finishMatch(Request $request)
     {
         $current = session('current_match');
         if (!$current) return redirect('/scoreboard')->with('error', 'Tidak ada match aktif.');
 
-        $winnerTeam = $this->detectMatchWinner($current);
-        if (!$winnerTeam) {
-            return redirect('/scoreboard/match')->with('error', 'Match belum selesai.');
+        // Jika belum ada winner, tetapkan winner berdasarkan skor tertinggi
+        if (!isset($current['winner'])) {
+            if ($current['game_type'] === 'badminton') {
+                $current['winner'] = $current['pointsA'] > $current['pointsB'] ? 'A' : 'B';
+            } elseif ($current['game_type'] === 'tennis') {
+                if ($current['tennis']['gamesA'] > $current['tennis']['gamesB']) {
+                    $current['winner'] = 'A';
+                } elseif ($current['tennis']['gamesB'] > $current['tennis']['gamesA']) {
+                    $current['winner'] = 'B';
+                } else {
+                    $current['winner'] = $current['tennis']['scoreA'] > $current['tennis']['scoreB'] ? 'A' : 'B';
+                }
+            } elseif ($current['game_type'] === 'padel') {
+                $setsA = 0; $setsB = 0;
+                for ($i = 0; $i < $current['best_of_sets']; $i++) {
+                    if (($current['sets']['A'][$i] ?? 0) > ($current['sets']['B'][$i] ?? 0)) $setsA++;
+                    if (($current['sets']['B'][$i] ?? 0) > ($current['sets']['A'][$i] ?? 0)) $setsB++;
+                }
+                $current['winner'] = $setsA > $setsB ? 'A' : 'B';
+            }
         }
 
-        $scores = session('scores', []); // structure: [name => ['win'=>int,'lose'=>int,'first_win_ts'=>timestamp?]]
+        $current['finished'] = true;
+        $current['finished_at'] = now()->toDateTimeString();
+        $current['finished_timestamp'] = now()->timestamp;
+        
+        // Process match finish
+        return $this->processMatchFinish($current);
+    }
+
+    // process match finish and update scores
+    protected function processMatchFinish($current)
+    {
+        $scores = session('scores', []);
 
         // update win/lose using team members
-        $teamW = $winnerTeam === 'A' ? $current['teamA'] : $current['teamB'];
-        $teamL = $winnerTeam === 'A' ? $current['teamB'] : $current['teamA'];
+        $teamW = $current['winner'] === 'A' ? $current['teamA'] : $current['teamB'];
+        $teamL = $current['winner'] === 'A' ? $current['teamB'] : $current['teamA'];
 
         foreach ($teamW as $p) {
-            $scores[$p]['win'] = ($scores[$p]['win'] ?? 0) + 1;
-            // set entry order info (first time they won)
-            if (!isset($scores[$p]['first_entry_order'])) {
-                $players = session('players', []);
-                $scores[$p]['first_entry_order'] = array_search($p, $players);
+            if ($p) {
+                $scores[$p]['win'] = ($scores[$p]['win'] ?? 0) + 1;
+                if (!isset($scores[$p]['first_entry_order'])) {
+                    $players = session('players', []);
+                    $scores[$p]['first_entry_order'] = array_search($p, $players);
+                }
+                // Hitung total waktu bermain
+                $duration = isset($current['finished_timestamp']) 
+                    ? $current['finished_timestamp'] - $current['started_timestamp']
+                    : 0;
+                $scores[$p]['total_play_time'] = ($scores[$p]['total_play_time'] ?? 0) + $duration;
             }
         }
 
         foreach ($teamL as $p) {
-            $scores[$p]['lose'] = ($scores[$p]['lose'] ?? 0) + 1;
-            if (!isset($scores[$p]['first_entry_order'])) {
-                $players = session('players', []);
-                $scores[$p]['first_entry_order'] = array_search($p, $players);
+            if ($p) {
+                $scores[$p]['lose'] = ($scores[$p]['lose'] ?? 0) + 1;
+                if (!isset($scores[$p]['first_entry_order'])) {
+                    $players = session('players', []);
+                    $scores[$p]['first_entry_order'] = array_search($p, $players);
+                }
+                // Hitung total waktu bermain
+                $duration = isset($current['finished_timestamp']) 
+                    ? $current['finished_timestamp'] - $current['started_timestamp']
+                    : 0;
+                $scores[$p]['total_play_time'] = ($scores[$p]['total_play_time'] ?? 0) + $duration;
             }
         }
 
         session(['scores' => $scores]);
 
-        // push finished match to history (optional)
+        // push finished match to history
         $matches = session('matches', []);
         $matches[] = $current;
         session(['matches' => $matches]);
 
-        // clear current match to allow next match
+        // clear current match
         session()->forget('current_match');
 
-        return redirect('/scoreboard/leaderboard');
+        return redirect('/scoreboard/leaderboard')->with('success', 'Pertandingan selesai! Pemenang: Team ' . $current['winner']);
     }
 
     // leaderboard view
@@ -202,11 +360,17 @@ class ScoreboardController extends Controller
         // normalize scores entries
         foreach ($players as $p) {
             if (!isset($scores[$p])) {
-                $scores[$p] = ['win' => 0, 'lose' => 0, 'first_entry_order' => array_search($p, $players)];
+                $scores[$p] = [
+                    'win' => 0, 
+                    'lose' => 0, 
+                    'first_entry_order' => array_search($p, $players),
+                    'total_play_time' => 0
+                ];
             } else {
                 $scores[$p]['win'] = $scores[$p]['win'] ?? 0;
                 $scores[$p]['lose'] = $scores[$p]['lose'] ?? 0;
                 $scores[$p]['first_entry_order'] = $scores[$p]['first_entry_order'] ?? array_search($p, $players);
+                $scores[$p]['total_play_time'] = $scores[$p]['total_play_time'] ?? 0;
             }
         }
 
@@ -222,14 +386,17 @@ class ScoreboardController extends Controller
             return $pointsB <=> $pointsA;
         });
 
-        return view('scoreboard.leaderboard', ['rank' => $rank]);
+        return view('scoreboard.leaderboard', [
+            'rank' => $rank,
+            'players' => $players
+        ]);
     }
 
     // reset everything
     public function reset()
     {
         session()->forget(['players', 'scores', 'matches', 'current_match', 'game_type', 'mode']);
-        return redirect('/scoreboard');
+        return redirect('/scoreboard')->with('success', 'Semua data berhasil direset.');
     }
 
     /* ----------------------
@@ -247,117 +414,130 @@ class ScoreboardController extends Controller
 
         // check winner
         if (($a >= 21 || $b >= 21) && abs($a - $b) >= 2) {
-            // winner found
             $current['winner'] = $a > $b ? 'A' : 'B';
         } elseif ($a === 30 || $b === 30) {
-            // cap at 30
             $current['winner'] = $a === 30 ? 'A' : 'B';
         }
     }
 
-    // tennis single-game scoring: 0,15,30,40 -> deuce -> advantage -> game
+    // tennis scoring system
     protected function tennisPoint(array &$current, string $team)
     {
-        // use tennis state
         $state = &$current['tennis'];
-        // convert stored numeric to points
+        
         if ($team === 'A') {
-            // if currently adv for B and A scores => back to deuce
             if ($state['adv'] === 'B') {
-                $state['adv'] = null; // back to deuce
+                $state['adv'] = null;
                 return;
             }
-
-            // if adv for A and A scores => A wins
             if ($state['adv'] === 'A') {
-                $current['winner'] = 'A';
+                $state['gamesA']++;
+                $this->resetTennisGame($current);
+                $this->checkTennisSet($current);
                 return;
             }
-
-            // normal increment
             $state['scoreA']++;
-
         } else {
             if ($state['adv'] === 'A') {
                 $state['adv'] = null;
                 return;
             }
             if ($state['adv'] === 'B') {
-                $current['winner'] = 'B';
+                $state['gamesB']++;
+                $this->resetTennisGame($current);
+                $this->checkTennisSet($current);
                 return;
             }
             $state['scoreB']++;
         }
 
-        // check if both at least 3 (40) => deuce logic
-        if ($state['scoreA'] >= 3 && $state['scoreB'] >= 3) {
+        if ($state['scoreA'] >= 4 && $state['scoreA'] - $state['scoreB'] >= 2) {
+            $state['gamesA']++;
+            $this->resetTennisGame($current);
+            $this->checkTennisSet($current);
+        } elseif ($state['scoreB'] >= 4 && $state['scoreB'] - $state['scoreA'] >= 2) {
+            $state['gamesB']++;
+            $this->resetTennisGame($current);
+            $this->checkTennisSet($current);
+        } elseif ($state['scoreA'] >= 3 && $state['scoreB'] >= 3) {
             if ($state['scoreA'] === $state['scoreB']) {
-                // deuce
                 $state['adv'] = null;
-            } elseif ($state['scoreA'] > $state['scoreB']) {
-                if ($state['scoreA'] - $state['scoreB'] >= 2) {
-                    $current['winner'] = 'A';
-                } else {
-                    // if lead by 1 after deuce -> advantage A
-                    $state['adv'] = 'A';
-                }
-            } else {
-                if ($state['scoreB'] - $state['scoreA'] >= 2) {
-                    $current['winner'] = 'B';
-                } else {
-                    $state['adv'] = 'B';
-                }
-            }
-        } else {
-            // if someone reaches 4 before opponent reaches 3 -> wins (i.e., 0,15,30,40 -> next => win)
-            if ($state['scoreA'] >= 4 && $state['scoreA'] - $state['scoreB'] >= 1) {
-                $current['winner'] = 'A';
-            }
-            if ($state['scoreB'] >= 4 && $state['scoreB'] - $state['scoreA'] >= 1) {
-                $current['winner'] = 'B';
+            } elseif ($state['scoreA'] - $state['scoreB'] === 1) {
+                $state['adv'] = 'A';
+            } elseif ($state['scoreB'] - $state['scoreA'] === 1) {
+                $state['adv'] = 'B';
             }
         }
     }
 
-    // padel: track games per set and tiebreak at 6-6
+    protected function resetTennisGame(array &$current)
+    {
+        $current['tennis']['scoreA'] = 0;
+        $current['tennis']['scoreB'] = 0;
+        $current['tennis']['adv'] = null;
+    }
+
+    protected function checkTennisSet(array &$current)
+    {
+        $state = &$current['tennis'];
+        
+        if ($state['gamesA'] >= 6 && $state['gamesA'] - $state['gamesB'] >= 2) {
+            $state['setsA']++;
+            $state['gamesA'] = 0;
+            $state['gamesB'] = 0;
+        } elseif ($state['gamesB'] >= 6 && $state['gamesB'] - $state['gamesA'] >= 2) {
+            $state['setsB']++;
+            $state['gamesA'] = 0;
+            $state['gamesB'] = 0;
+        } elseif ($state['gamesA'] === 7 || $state['gamesB'] === 7) {
+            if ($state['gamesA'] === 7) {
+                $state['setsA']++;
+            } else {
+                $state['setsB']++;
+            }
+            $state['gamesA'] = 0;
+            $state['gamesB'] = 0;
+        }
+
+        // Check for match win (best of 3 sets)
+        if ($state['setsA'] >= 2) {
+            $current['winner'] = 'A';
+        } elseif ($state['setsB'] >= 2) {
+            $current['winner'] = 'B';
+        }
+    }
+
+    // padel scoring
     protected function padelPoint(array &$current, string $team)
     {
-        // if currently in tiebreak for set
         $setIndex = $current['current_set_index'];
         $A_games = $current['sets']['A'][$setIndex];
         $B_games = $current['sets']['B'][$setIndex];
 
         if ($current['in_tiebreak']) {
-            // increment tiebreak points
             $current['tiebreak_points'][$team]++;
             $tpA = $current['tiebreak_points']['A'];
             $tpB = $current['tiebreak_points']['B'];
-            // tiebreak first to 7 by 2
+            
             if (($tpA >= 7 || $tpB >= 7) && abs($tpA - $tpB) >= 2) {
-                // tiebreak winner wins the set
                 if ($tpA > $tpB) {
                     $current['sets']['A'][$setIndex]++;
                 } else {
                     $current['sets']['B'][$setIndex]++;
                 }
-                // end tiebreak and reset
                 $current['in_tiebreak'] = false;
                 $current['tiebreak_points'] = ['A' => 0, 'B' => 0];
-                // after finishing set, maybe check match winner below
                 $this->checkPadelSetWin($current);
             }
             return;
         }
 
-        // not in tiebreak: adding a point means awarding a game to that team
-        // in padel we usually track games not points; for simplicity, we interpret addPoint as awarding a game (caller should call multiple times to increment games)
         if ($team === 'A') {
             $current['sets']['A'][$setIndex]++;
         } else {
             $current['sets']['B'][$setIndex]++;
         }
 
-        // check if set reached 6-6 to start tiebreak
         $A_games = $current['sets']['A'][$setIndex];
         $B_games = $current['sets']['B'][$setIndex];
 
@@ -367,72 +547,28 @@ class ScoreboardController extends Controller
             return;
         }
 
-        // normal set win: first to 6 with 2-game margin OR if someone reaches 7 (win by cap)
         if (($A_games >= 6 || $B_games >= 6) && abs($A_games - $B_games) >= 2) {
-            // set finished
             $this->checkPadelSetWin($current);
         } elseif ($A_games === 7 || $B_games === 7) {
-            // someone reached 7 (possible if no tie-break was used) -> count as set win
             $this->checkPadelSetWin($current);
         }
     }
 
-    // helper: after set finished, advance set index or determine match winner for padel
     protected function checkPadelSetWin(array &$current)
     {
-        $idx = $current['current_set_index'];
-        $A_games = $current['sets']['A'][$idx];
-        $B_games = $current['sets']['B'][$idx];
-
-        // who won this set?
-        if ($A_games > $B_games) {
-            // A won this set
-            // move to next set
-        } else {
-            // B won
-        }
-
-        // advance set index if match not yet decided
         $setsWonA = 0; $setsWonB = 0;
         for ($i = 0; $i < $current['best_of_sets']; $i++) {
             if (($current['sets']['A'][$i] ?? 0) > ($current['sets']['B'][$i] ?? 0)) $setsWonA++;
             if (($current['sets']['B'][$i] ?? 0) > ($current['sets']['A'][$i] ?? 0)) $setsWonB++;
         }
 
-        // if someone reached majority of sets -> set winner of match
         $need = intdiv($current['best_of_sets'], 2) + 1;
         if ($setsWonA >= $need) {
             $current['winner'] = 'A';
         } elseif ($setsWonB >= $need) {
             $current['winner'] = 'B';
         } else {
-            // continue to next set
-            $current['current_set_index'] = $idx + 1;
+            $current['current_set_index']++;
         }
-    }
-
-    // detect winner for badminton/tennis (current winner is set by helper funcs),
-    // for padel we check 'winner' set in checkPadelSetWin
-    protected function detectMatchWinner(array $current)
-    {
-        // if winner key present -> return it
-        if (!empty($current['winner'])) return $current['winner'];
-
-        // badminton: winner set in badmintonPoint
-        if ($current['game_type'] === 'badminton') {
-            return $current['winner'] ?? null;
-        }
-
-        // tennis: winner set in tennisPoint
-        if ($current['game_type'] === 'tennis') {
-            return $current['winner'] ?? null;
-        }
-
-        // padel: winner set in checkPadelSetWin
-        if ($current['game_type'] === 'padel') {
-            return $current['winner'] ?? null;
-        }
-
-        return null;
     }
 }
