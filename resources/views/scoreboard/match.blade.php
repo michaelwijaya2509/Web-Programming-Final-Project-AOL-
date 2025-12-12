@@ -1,721 +1,632 @@
 @extends('layouts.app')
 
+@section('title', 'Live Scoreboard')
+
 @section('content')
-<div class="container">
-    <!-- Game Info Header dengan Timer -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card bg-light">
-                <div class="card-body py-3">
-                    <div class="row align-items-center">
-                        <div class="col-md-3">
-                            <h4 class="mb-0">
-                                <i class="fas fa-gamepad text-primary me-2"></i>
-                                <strong>{{ strtoupper($current['game_type']) }}</strong>
-                                <small class="text-muted">| {{ ucfirst($current['mode']) }}</small>
-                            </h4>
-                        </div>
-                        <div class="col-md-3 text-center">
-                            <div class="timer-display">
-                                <i class="fas fa-clock me-1 text-primary"></i>
-                                <strong><span id="match-timer">00:00</span></strong>
-                                <small class="text-muted d-block">Durasi Permainan</small>
-                            </div>
-                        </div>
-                        <div class="col-md-3 text-center">
-                            <small class="text-muted">
-                                <i class="fas fa-calendar me-1"></i>
-                                Dimulai: <span id="start-time">{{ date('H:i', strtotime($current['started_at'])) }}</span>
-                            </small>
-                        </div>
-                        <div class="col-md-3 text-end">
-                            @if(isset($current['winner']))
-                                <span class="badge bg-success">
-                                    <i class="fas fa-flag-checkered me-1"></i> SELESAI
-                                </span>
-                            @else
-                                <span class="badge bg-warning text-dark">
-                                    <i class="fas fa-spinner me-1"></i> BERLANGSUNG
-                                </span>
-                            @endif
-                        </div>
-                    </div>
+
+<!-- Hero Section -->
+<div class="relative w-full h-[400px] flex items-center">
+    <div class="absolute inset-0 bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 z-0"></div>
+    <div class="absolute inset-0 bg-black/30 z-10"></div>
+    
+    <div class="relative z-20 container mx-auto px-6 md:px-12 text-white">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 leading-tight drop-shadow-lg">
+            Live <br>
+            Scoreboard Manager
+        </h1>
+        <p class="text-lg md:text-xl mb-8 max-w-2xl drop-shadow-md text-gray-100">
+            Pantau skor secara real-time! Kelola pertandingan dengan sistem scoring otomatis untuk berbagai jenis olahraga.
+        </p>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-30">
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
+        
+        <!-- Card Header -->
+        <!-- <div class="bg-gradient-to-r from-orange-500 to-red-500 px-8 py-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-white">
+                        <i class="fas fa-chart-line mr-3"></i> Live Scoreboard
+                    </h2>
+                    <p class="text-orange-100 mt-1">
+                        Pantau pertandingan secara real-time. Tambahkan poin dan kelola skor dengan mudah.
+                    </p>
+                </div>
+                <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
+                    <span class="text-sm text-white/80">Match Timer</span>
+                    <div class="text-2xl font-bold text-white text-center" id="match-timer">00:00</div>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Auto Redirect Message (Hanya tampil jika sudah selesai) -->
-    @if(isset($current['winner']))
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="alert alert-success text-center">
-                <h3 class="mb-3">
-                    <i class="fas fa-trophy me-2"></i> 
-                    <strong>PERTANDINGAN SELESAI!</strong>
-                    <i class="fas fa-trophy ms-2"></i>
-                </h3>
-                <h2 class="mb-4">
-                    <span class="badge bg-warning text-dark fs-2 p-3">
-                        🏆 TEAM {{ $current['winner'] }} MENANG! 🏆
-                    </span>
-                </h2>
-                
-                <!-- Match Summary -->
-                <div class="row justify-content-center mb-4">
-                    <div class="col-md-8">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="row text-center">
-                                    <div class="col-md-4">
-                                        <h5>Durasi</h5>
-                                        <h4 id="final-duration">00:00</h4>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <h5>Game Type</h5>
-                                        <h4>{{ strtoupper($current['game_type']) }}</h4>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <h5>Mode</h5>
-                                        <h4>{{ ucfirst($current['mode']) }}</h4>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Redirect Countdown -->
-                <div class="countdown-box">
-                    <div class="spinner-border text-primary me-3" role="status">
-                        <span class="visually-hidden">Loading...</span>
+        </div> -->
+
+        <!-- Card Body -->
+        <div class="p-4 max-w-6xl mx-auto">
+    <div class="mb-4">
+        <div class="bg-gradient-to-br from-gray-50 to-white rounded-lg border border-gray-200 px-4 py-3 shadow-sm">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-md bg-gradient-to-r from-orange-100 to-red-100 flex items-center justify-center shrink-0">
+                        <i class="fas fa-info-circle text-orange-600 text-sm"></i>
                     </div>
                     <div>
-                        <h5 class="mb-1">Mengarahkan ke leaderboard dalam...</h5>
-                        <h3 class="mb-0"><span id="countdown">5</span> detik</h3>
+                        <h3 class="text-sm font-bold text-gray-900 leading-tight">Match Status</h3>
+                        <p class="text-gray-500 text-xs">
+                            {{ strtoupper($current['game_type']) }} • {{ ucfirst($current['mode']) }}
+                        </p>
                     </div>
                 </div>
+                
+                @if(isset($current['winner']))
+                <span class="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-3 py-1 rounded-md text-xs font-bold shadow-sm">
+                    <i class="fas fa-check mr-1"></i> DONE
+                </span>
+                @else
+                <span class="bg-gradient-to-r from-orange-500 to-red-500 text-white px-3 py-1 rounded-md text-xs font-bold animate-pulse shadow-sm">
+                    <i class="fas fa-circle mr-1 text-[10px]"></i> LIVE
+                </span>
+                @endif
             </div>
+            
+            @if(isset($current['winner']))
+            <div class="bg-green-50 rounded-md p-2 mt-2 border border-green-100 flex items-center justify-center gap-2">
+                <i class="fas fa-trophy text-yellow-500"></i>
+                <span class="text-xs font-bold text-gray-700">MATCH COMPLETED! Redirecting in <span id="countdown" class="text-emerald-600">5</span>s</span>
+            </div>
+            @endif
         </div>
     </div>
-    
-    <!-- Final Score Display -->
-    <div class="row mb-5">
-        <div class="col-md-5">
-            <div class="card {{ $current['winner'] === 'A' ? 'border-success shadow-lg' : 'border-primary' }}">
-                <div class="card-header {{ $current['winner'] === 'A' ? 'bg-success text-white' : 'bg-primary text-white' }}">
-                    <h4 class="card-title mb-0">
-                        @if($current['winner'] === 'A')
-                            <i class="fas fa-crown me-2"></i> 
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 mb-4">
+        <div class="lg:col-span-5">
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm group hover:shadow-md transition-all duration-300 h-full">
+                <div class="bg-gradient-to-r from-orange-500 to-red-500 px-3 py-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded bg-white/20 flex items-center justify-center shrink-0">
+                                <i class="fas fa-flag text-white text-xs"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="text-white font-bold text-sm leading-none">TEAM A</h3>
+                                <p class="text-orange-100 text-xs truncate max-w-[150px] opacity-90">
+                                    {{ implode(', ', $teamA) }}
+                                </p>
+                            </div>
+                        </div>
+                        @if(isset($current['winner']) && $current['winner'] === 'A')
+                        <i class="fas fa-trophy text-yellow-300 text-sm"></i>
                         @endif
-                        TEAM A
-                        @if($current['winner'] === 'A')
-                            <span class="float-end">🏆 WINNER</span>
-                        @endif
-                    </h4>
-                </div>
-                <div class="card-body text-center">
-                    <h5 class="text-primary mb-3">
-                        @foreach($teamA as $player)
-                            <span class="badge bg-light text-dark border">{{ $player }}</span>
-                        @endforeach
-                    </h5>
-                    
-                    @if($current['game_type'] === 'badminton')
-                        <h1 class="display-1 {{ $current['winner'] === 'A' ? 'text-success' : 'text-primary' }}">
-                            {{ $current['pointsA'] }}
-                        </h1>
-                    @elseif($current['game_type'] === 'tennis')
-                        <h4 class="text-muted mb-2">
-                            Set: {{ $current['tennis']['setsA'] }} | Game: {{ $current['tennis']['gamesA'] }}
-                        </h4>
-                        <h1 class="display-1 {{ $current['winner'] === 'A' ? 'text-success' : 'text-primary' }}">
-                            @php
-                                $scoreMap = [0 => '0', 1 => '15', 2 => '30', 3 => '40'];
-                                $displayScore = $scoreMap[$current['tennis']['scoreA']] ?? $current['tennis']['scoreA'];
-                            @endphp
-                            {{ $displayScore }}
-                        </h1>
-                    @elseif($current['game_type'] === 'padel')
-                        <h4 class="text-muted mb-2">
-                            Set 1: {{ $current['sets']['A'][0] }} | 
-                            Set 2: {{ $current['sets']['A'][1] }} | 
-                            Set 3: {{ $current['sets']['A'][2] }}
-                        </h4>
-                        <h1 class="display-1 {{ $current['winner'] === 'A' ? 'text-success' : 'text-primary' }}">
-                            {{ $current['sets']['A'][$current['current_set_index']] }}
-                        </h1>
-                    @endif
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-2 d-flex align-items-center justify-content-center">
-            <div class="text-center">
-                <div class="vs-circle bg-gradient-primary text-white mb-3">
-                    <h2 class="mb-0">VS</h2>
-                </div>
-                <div class="final-badge">
-                    <span class="badge bg-success fs-5 p-2">
-                        <i class="fas fa-flag-checkered me-1"></i> FINAL
-                    </span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-5">
-            <div class="card {{ $current['winner'] === 'B' ? 'border-success shadow-lg' : 'border-danger' }}">
-                <div class="card-header {{ $current['winner'] === 'B' ? 'bg-success text-white' : 'bg-danger text-white' }}">
-                    <h4 class="card-title mb-0">
-                        @if($current['winner'] === 'B')
-                            <i class="fas fa-crown me-2"></i> 
-                        @endif
-                        TEAM B
-                        @if($current['winner'] === 'B')
-                            <span class="float-end">🏆 WINNER</span>
-                        @endif
-                    </h4>
-                </div>
-                <div class="card-body text-center">
-                    <h5 class="text-danger mb-3">
-                        @foreach($teamB as $player)
-                            <span class="badge bg-light text-dark border">{{ $player }}</span>
-                        @endforeach
-                    </h5>
-                    
-                    @if($current['game_type'] === 'badminton')
-                        <h1 class="display-1 {{ $current['winner'] === 'B' ? 'text-success' : 'text-danger' }}">
-                            {{ $current['pointsB'] }}
-                        </h1>
-                    @elseif($current['game_type'] === 'tennis')
-                        <h4 class="text-muted mb-2">
-                            Set: {{ $current['tennis']['setsB'] }} | Game: {{ $current['tennis']['gamesB'] }}
-                        </h4>
-                        <h1 class="display-1 {{ $current['winner'] === 'B' ? 'text-success' : 'text-danger' }}">
-                            @php
-                                $scoreMap = [0 => '0', 1 => '15', 2 => '30', 3 => '40'];
-                                $displayScore = $scoreMap[$current['tennis']['scoreB']] ?? $current['tennis']['scoreB'];
-                            @endphp
-                            {{ $displayScore }}
-                        </h1>
-                    @elseif($current['game_type'] === 'padel')
-                        <h4 class="text-muted mb-2">
-                            Set 1: {{ $current['sets']['B'][0] }} | 
-                            Set 2: {{ $current['sets']['B'][1] }} | 
-                            Set 3: {{ $current['sets']['B'][2] }}
-                        </h4>
-                        <h1 class="display-1 {{ $current['winner'] === 'B' ? 'text-success' : 'text-danger' }}">
-                            {{ $current['sets']['B'][$current['current_set_index']] }}
-                        </h1>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    @else
-    <!-- GAME MASIH BERLANGSUNG -->
-    <div class="row mb-5">
-        <!-- Team A -->
-        <div class="col-md-5">
-            <div class="card border-primary shadow-sm h-100">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="card-title mb-0">
-                        <i class="fas fa-flag me-2"></i> TEAM A
-                    </h4>
-                </div>
-                <div class="card-body text-center">
-                    <!-- Players -->
-                    <div class="mb-4">
-                        <h5 class="text-primary">
-                            @foreach($teamA as $player)
-                                <span class="badge bg-light text-dark border border-primary">{{ $player }}</span>
-                            @endforeach
-                        </h5>
                     </div>
-                    
-                    <!-- Score Display -->
+                </div>
+                
+                <div class="p-3">
                     @if($current['game_type'] === 'badminton')
-                        <div class="score-display mb-3">
-                            <h1 class="display-1 text-primary" id="scoreA">{{ $current['pointsA'] }}</h1>
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-4xl font-bold text-gray-900 tracking-tight" id="scoreA">{{ $current['pointsA'] }}</div>
+                            <div class="text-right">
+                                <div class="text-[10px] text-gray-500 uppercase font-bold">POINTS</div>
+                                <div class="text-xs font-medium text-orange-600">{{ $current['pointsA'] }}/21</div>
+                            </div>
                         </div>
                         
-                        <div class="progress mb-4" style="height: 25px;">
-                            @php 
-                                $percentage = min(100, ($current['pointsA'] / 21) * 100);
-                                $color = $current['pointsA'] >= 21 ? 'bg-success' : 'bg-primary';
-                            @endphp
-                            <div class="progress-bar {{ $color }} progress-bar-striped progress-bar-animated" 
-                                 style="width: {{ $percentage }}%;">
-                                <strong>{{ $current['pointsA'] }}/21</strong>
+                        <div class="w-full bg-gray-100 rounded-full h-1.5 mb-3">
+                            <div class="h-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-700 ease-out" 
+                                 style="width: {{ min(100, ($current['pointsA'] / 21) * 100) }}%">
                             </div>
                         </div>
                         
                     @elseif($current['game_type'] === 'tennis')
-                        <h6 class="text-muted mb-2">
-                            Set: <strong>{{ $current['tennis']['setsA'] }}</strong> | 
-                            Game: <strong>{{ $current['tennis']['gamesA'] }}</strong>
-                        </h6>
-                        
-                        <div class="score-display mb-3">
-                            <h1 class="display-1 text-primary">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="text-center px-2">
+                                <div class="text-[10px] text-gray-500">SETS</div>
+                                <div class="text-xl font-bold text-gray-900">{{ $current['tennis']['setsA'] }}</div>
+                            </div>
+                            <div class="text-center px-2 border-l border-r border-gray-100">
+                                <div class="text-[10px] text-gray-500">GAMES</div>
+                                <div class="text-xl font-bold text-gray-900">{{ $current['tennis']['gamesA'] }}</div>
+                            </div>
+                            <div class="text-center px-2">
+                                <div class="text-[10px] text-gray-500">POINTS</div>
                                 @php
                                     $scoreMap = [0 => '0', 1 => '15', 2 => '30', 3 => '40'];
                                     $displayScore = $scoreMap[$current['tennis']['scoreA']] ?? $current['tennis']['scoreA'];
                                 @endphp
-                                {{ $displayScore }}
-                            </h1>
+                                <div class="text-3xl font-bold text-orange-600">{{ $displayScore }}</div>
+                            </div>
                         </div>
-                        
                         @if($current['tennis']['adv'] === 'A')
-                            <div class="mb-4">
-                                <span class="badge bg-warning text-dark fs-5 p-2">
-                                    <i class="fas fa-crown me-1"></i> ADVANTAGE
-                                </span>
-                            </div>
+                        <div class="text-center bg-yellow-50 text-yellow-700 text-[10px] font-bold py-1 rounded">ADVANTAGE</div>
                         @endif
-                        
+
                     @elseif($current['game_type'] === 'padel')
-                        <h6 class="text-muted mb-2">
-                            Set Saat Ini: <strong>{{ $current['current_set_index'] + 1 }}</strong>
-                        </h6>
-                        
-                        <div class="score-display mb-3">
-                            <h1 class="display-1 text-primary">
-                                {{ $current['sets']['A'][$current['current_set_index']] }}
-                            </h1>
-                        </div>
-                        
-                        @if($current['in_tiebreak'])
-                            <div class="mb-4">
-                                <h4 class="text-warning">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                    Tiebreak: <strong>{{ $current['tiebreak_points']['A'] }}</strong>
-                                </h4>
+                        <div class="flex justify-between items-end mb-2">
+                            <div>
+                                <span class="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold">Set {{ $current['current_set_index'] + 1 }}</span>
+                                <div class="text-4xl font-bold text-gray-900 leading-none mt-1">{{ $current['sets']['A'][$current['current_set_index']] }}</div>
                             </div>
-                        @endif
-                        
-                        <div class="text-muted small">
-                            <div>Set 1: {{ $current['sets']['A'][0] }}</div>
-                            <div>Set 2: {{ $current['sets']['A'][1] }}</div>
-                            <div>Set 3: {{ $current['sets']['A'][2] }}</div>
+                            <div class="flex gap-1">
+                                @for($i = 0; $i < 3; $i++)
+                                <div class="bg-gray-50 rounded p-1 text-center border border-gray-100 w-8">
+                                    <div class="text-[9px] text-gray-400">S{{ $i + 1 }}</div>
+                                    <div class="text-sm font-bold text-gray-800">{{ $current['sets']['A'][$i] }}</div>
+                                </div>
+                                @endfor
+                            </div>
                         </div>
+                        @if($current['in_tiebreak'])
+                        <div class="text-center bg-yellow-50 text-yellow-700 text-[10px] font-bold py-1 rounded">Tiebreak: {{ $current['tiebreak_points']['A'] }}</div>
+                        @endif
                     @endif
+
+                    <div class="mt-2 pt-2 border-t border-gray-100 flex flex-wrap gap-1.5">
+                        @foreach($teamA as $player)
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-gray-50 border border-gray-200 text-xs text-gray-600">
+                            <i class="fas fa-user text-[10px] text-orange-400"></i> {{ $player }}
+                        </span>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
         
-        <!-- VS Center -->
-        <div class="col-md-2 d-flex align-items-center justify-content-center">
-            <div class="text-center">
-                <div class="vs-circle bg-gradient-primary text-white mb-3">
-                    <h2 class="mb-0">VS</h2>
-                </div>
-                
-                <!-- Live Timer -->
-                <div class="live-timer">
-                    <div class="badge bg-info text-white fs-6 p-2">
-                        <i class="fas fa-clock me-1"></i>
-                        <span id="live-timer">00:00</span>
+        <div class="lg:col-span-2 flex items-center justify-center py-2 lg:py-0">
+            <div class="flex lg:flex-col items-center gap-4 lg:gap-2 w-full justify-center">
+                <div class="relative shrink-0">
+                    <div class="w-12 h-12 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center shadow-md">
+                        <span class="text-white font-bold text-sm">VS</span>
                     </div>
                 </div>
                 
-                <!-- Reset Timer Button (Hanya untuk debug) -->
-                @if(config('app.debug'))
-                <div class="mt-2">
-                    <button onclick="resetTimer()" class="btn btn-outline-secondary btn-sm">
-                        <i class="fas fa-sync-alt me-1"></i> Reset Timer
-                    </button>
+                @if(!isset($current['winner']))
+                <div class="bg-gray-800 rounded px-3 py-1 border border-gray-700 shadow-sm">
+                    <div class="text-sm font-bold text-white font-mono" id="live-timer">00:00</div>
                 </div>
+                @else
+                <div class="bg-green-100 text-green-700 px-2 py-1 rounded text-[10px] font-bold uppercase">Finished</div>
                 @endif
             </div>
         </div>
         
-        <!-- Team B -->
-        <div class="col-md-5">
-            <div class="card border-danger shadow-sm h-100">
-                <div class="card-header bg-danger text-white">
-                    <h4 class="card-title mb-0">
-                        <i class="fas fa-flag me-2"></i> TEAM B
-                    </h4>
-                </div>
-                <div class="card-body text-center">
-                    <!-- Players -->
-                    <div class="mb-4">
-                        <h5 class="text-danger">
-                            @foreach($teamB as $player)
-                                <span class="badge bg-light text-dark border border-danger">{{ $player }}</span>
-                            @endforeach
-                        </h5>
+        <div class="lg:col-span-5">
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm group hover:shadow-md transition-all duration-300 h-full">
+                <div class="bg-gradient-to-r from-blue-500 to-blue-600 px-3 py-2">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded bg-white/20 flex items-center justify-center shrink-0">
+                                <i class="fas fa-flag text-white text-xs"></i>
+                            </div>
+                            <div class="min-w-0">
+                                <h3 class="text-white font-bold text-sm leading-none">TEAM B</h3>
+                                <p class="text-blue-100 text-xs truncate max-w-[150px] opacity-90">
+                                    {{ implode(', ', $teamB) }}
+                                </p>
+                            </div>
+                        </div>
+                        @if(isset($current['winner']) && $current['winner'] === 'B')
+                        <i class="fas fa-trophy text-yellow-300 text-sm"></i>
+                        @endif
                     </div>
-                    
-                    <!-- Score Display -->
+                </div>
+                
+                <div class="p-3">
                     @if($current['game_type'] === 'badminton')
-                        <div class="score-display mb-3">
-                            <h1 class="display-1 text-danger" id="scoreB">{{ $current['pointsB'] }}</h1>
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="text-4xl font-bold text-gray-900 tracking-tight" id="scoreB">{{ $current['pointsB'] }}</div>
+                            <div class="text-right">
+                                <div class="text-[10px] text-gray-500 uppercase font-bold">POINTS</div>
+                                <div class="text-xs font-medium text-blue-600">{{ $current['pointsB'] }}/21</div>
+                            </div>
                         </div>
                         
-                        <div class="progress mb-4" style="height: 25px;">
-                            @php 
-                                $percentage = min(100, ($current['pointsB'] / 21) * 100);
-                                $color = $current['pointsB'] >= 21 ? 'bg-success' : 'bg-danger';
-                            @endphp
-                            <div class="progress-bar {{ $color }} progress-bar-striped progress-bar-animated" 
-                                 style="width: {{ $percentage }}%;">
-                                <strong>{{ $current['pointsB'] }}/21</strong>
+                        <div class="w-full bg-gray-100 rounded-full h-1.5 mb-3">
+                            <div class="h-1.5 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-700 ease-out" 
+                                 style="width: {{ min(100, ($current['pointsB'] / 21) * 100) }}%">
                             </div>
                         </div>
                         
                     @elseif($current['game_type'] === 'tennis')
-                        <h6 class="text-muted mb-2">
-                            Set: <strong>{{ $current['tennis']['setsB'] }}</strong> | 
-                            Game: <strong>{{ $current['tennis']['gamesB'] }}</strong>
-                        </h6>
-                        
-                        <div class="score-display mb-3">
-                            <h1 class="display-1 text-danger">
+                        <div class="flex justify-between items-center mb-2">
+                            <div class="text-center px-2">
+                                <div class="text-[10px] text-gray-500">SETS</div>
+                                <div class="text-xl font-bold text-gray-900">{{ $current['tennis']['setsB'] }}</div>
+                            </div>
+                            <div class="text-center px-2 border-l border-r border-gray-100">
+                                <div class="text-[10px] text-gray-500">GAMES</div>
+                                <div class="text-xl font-bold text-gray-900">{{ $current['tennis']['gamesB'] }}</div>
+                            </div>
+                            <div class="text-center px-2">
+                                <div class="text-[10px] text-gray-500">POINTS</div>
                                 @php
                                     $scoreMap = [0 => '0', 1 => '15', 2 => '30', 3 => '40'];
                                     $displayScore = $scoreMap[$current['tennis']['scoreB']] ?? $current['tennis']['scoreB'];
                                 @endphp
-                                {{ $displayScore }}
-                            </h1>
+                                <div class="text-3xl font-bold text-blue-600">{{ $displayScore }}</div>
+                            </div>
                         </div>
-                        
                         @if($current['tennis']['adv'] === 'B')
-                            <div class="mb-4">
-                                <span class="badge bg-warning text-dark fs-5 p-2">
-                                    <i class="fas fa-crown me-1"></i> ADVANTAGE
-                                </span>
-                            </div>
+                        <div class="text-center bg-yellow-50 text-yellow-700 text-[10px] font-bold py-1 rounded">ADVANTAGE</div>
                         @endif
-                        
+
                     @elseif($current['game_type'] === 'padel')
-                        <h6 class="text-muted mb-2">
-                            Set Saat Ini: <strong>{{ $current['current_set_index'] + 1 }}</strong>
-                        </h6>
-                        
-                        <div class="score-display mb-3">
-                            <h1 class="display-1 text-danger">
-                                {{ $current['sets']['B'][$current['current_set_index']] }}
-                            </h1>
-                        </div>
-                        
-                        @if($current['in_tiebreak'])
-                            <div class="mb-4">
-                                <h4 class="text-warning">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                    Tiebreak: <strong>{{ $current['tiebreak_points']['B'] }}</strong>
-                                </h4>
+                        <div class="flex justify-between items-end mb-2">
+                            <div>
+                                <span class="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold">Set {{ $current['current_set_index'] + 1 }}</span>
+                                <div class="text-4xl font-bold text-gray-900 leading-none mt-1">{{ $current['sets']['B'][$current['current_set_index']] }}</div>
                             </div>
-                        @endif
-                        
-                        <div class="text-muted small">
-                            <div>Set 1: {{ $current['sets']['B'][0] }}</div>
-                            <div>Set 2: {{ $current['sets']['B'][1] }}</div>
-                            <div>Set 3: {{ $current['sets']['B'][2] }}</div>
+                            <div class="flex gap-1">
+                                @for($i = 0; $i < 3; $i++)
+                                <div class="bg-gray-50 rounded p-1 text-center border border-gray-100 w-8">
+                                    <div class="text-[9px] text-gray-400">S{{ $i + 1 }}</div>
+                                    <div class="text-sm font-bold text-gray-800">{{ $current['sets']['B'][$i] }}</div>
+                                </div>
+                                @endfor
+                            </div>
                         </div>
+                        @if($current['in_tiebreak'])
+                        <div class="text-center bg-yellow-50 text-yellow-700 text-[10px] font-bold py-1 rounded">Tiebreak: {{ $current['tiebreak_points']['B'] }}</div>
+                        @endif
                     @endif
+
+                    <div class="mt-2 pt-2 border-t border-gray-100 flex flex-wrap gap-1.5">
+                        @foreach($teamB as $player)
+                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-gray-50 border border-gray-200 text-xs text-gray-600">
+                            <i class="fas fa-user text-[10px] text-blue-400"></i> {{ $player }}
+                        </span>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    
-    <!-- Control Buttons -->
-    <div class="row mb-5">
-        <div class="col-md-6 text-center">
-            <form action="/scoreboard/point" method="POST">
-                @csrf
-                <input type="hidden" name="team" value="A">
-                <button type="submit" class="btn btn-primary btn-lg control-btn" 
-                        style="min-width: 200px; min-height: 100px; font-size: 24px;"
-                        onclick="addPointAnimation('A')">
-                    <div>
-                        <i class="fas fa-plus-circle fa-2x mb-2"></i>
-                    </div>
-                    <div>+1 POINT</div>
-                    <div><small>TEAM A</small></div>
-                </button>
-            </form>
-        </div>
+
+    @if(!isset($current['winner']))
+    <div class="grid grid-cols-2 gap-3 mb-4">
+        <form action="/scoreboard/point" method="POST" class="w-full" id="pointFormA">
+            @csrf
+            <input type="hidden" name="team" value="A">
+            <button type="submit" 
+                    class="group w-full bg-gradient-to-r from-orange-500 to-red-500 text-white py-3 rounded-lg hover:from-orange-600 hover:to-red-600 transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2"
+                    onclick="addPoint('A')">
+                <i class="fas fa-plus-circle text-base"></i>
+                <div class="text-left leading-none">
+                    <div class="text-sm font-bold">ADD POINT</div>
+                    <div class="text-[10px] opacity-80">TEAM A</div>
+                </div>
+            </button>
+        </form>
         
-        <div class="col-md-6 text-center">
-            <form action="/scoreboard/point" method="POST">
-                @csrf
-                <input type="hidden" name="team" value="B">
-                <button type="submit" class="btn btn-danger btn-lg control-btn" 
-                        style="min-width: 200px; min-height: 100px; font-size: 24px;"
-                        onclick="addPointAnimation('B')">
-                    <div>
-                        <i class="fas fa-plus-circle fa-2x mb-2"></i>
-                    </div>
-                    <div>+1 POINT</div>
-                    <div><small>TEAM B</small></div>
-                </button>
-            </form>
-        </div>
+        <form action="/scoreboard/point" method="POST" class="w-full" id="pointFormB">
+            @csrf
+            <input type="hidden" name="team" value="B">
+            <button type="submit" 
+                    class="group w-full bg-gradient-to-r from-blue-500 to-blue-600 text-white py-3 rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all shadow-sm active:scale-95 flex items-center justify-center gap-2"
+                    onclick="addPoint('B')">
+                <i class="fas fa-plus-circle text-base"></i>
+                <div class="text-left leading-none">
+                    <div class="text-sm font-bold">ADD POINT</div>
+                    <div class="text-[10px] opacity-80">TEAM B</div>
+                </div>
+            </button>
+        </form>
     </div>
     @endif
-    
-    <!-- Action Buttons -->
-    <div class="row mb-4">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex flex-wrap justify-content-center gap-3">
-                        @if(isset($current['winner']))
-                            <!-- Redirect Button -->
-                            <a href="/scoreboard/leaderboard" class="btn btn-success btn-lg mb-2">
-                                <i class="fas fa-chart-line me-1"></i> Lihat Leaderboard
-                            </a>
-                            
-                            <!-- New Match Button -->
-                            <a href="/scoreboard/match" class="btn btn-warning btn-lg mb-2">
-                                <i class="fas fa-redo me-1"></i> Match Baru
-                            </a>
-                        @else
-                            <!-- Manual Finish Button -->
-                            <form action="/scoreboard/finish-match" method="POST" class="mb-2">
-                                @csrf
-                                <button type="submit" 
-                                        class="btn btn-warning btn-lg"
-                                        onclick="return confirm('Selesaikan pertandingan sekarang? Pemenang akan ditentukan berdasarkan skor saat ini.')">
-                                    <i class="fas fa-stop-circle me-1"></i> Selesaikan Sekarang
-                                </button>
-                            </form>
-                        @endif
-                        
-                        <!-- Setup Button -->
-                        <a href="/scoreboard/setup" class="btn btn-secondary btn-lg mb-2">
-                            <i class="fas fa-cog me-1"></i> Setup Ulang
-                        </a>
-                        
-                        <!-- Leaderboard Button -->
-                        <a href="/scoreboard/leaderboard" class="btn btn-info btn-lg mb-2">
-                            <i class="fas fa-chart-line me-1"></i> Leaderboard
-                        </a>
-                        
-                        <!-- Back to Players Button -->
-                        <a href="/scoreboard" class="btn btn-outline-primary btn-lg mb-2">
-                            <i class="fas fa-arrow-left me-1"></i> Kembali
-                        </a>
-                    </div>
-                </div>
+
+    <div class="border-t border-gray-200 pt-3">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex gap-2">
+                @if(!isset($current['winner']))
+                <form action="/scoreboard/finish-match" method="POST">
+                    @csrf
+                    <button type="submit" 
+                            class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm flex items-center gap-1"
+                            onclick="return confirm('Finish match now?')">
+                        <i class="fas fa-stop-circle"></i> FINISH
+                    </button>
+                </form>
+                @endif
+                
+                <a href="/scoreboard/setup" 
+                   class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg text-xs font-bold transition-colors flex items-center gap-1">
+                    <i class="fas fa-cog"></i> SETUP
+                </a>
             </div>
-        </div>
-    </div>
-    
-    <!-- Game Rules Info -->
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="card-title mb-0">
-                        <i class="fas fa-info-circle me-2"></i> Aturan Permainan
-                    </h5>
-                </div>
-                <div class="card-body">
-                    @if($current['game_type'] === 'badminton')
-                        <p><strong>🏸 Badminton:</strong> First to 21 points (win by 2), cap at 30 points. Game akan otomatis selesai ketika salah satu tim mencapai 21 dengan selisih minimal 2 poin.</p>
-                    @elseif($current['game_type'] === 'tennis')
-                        <p><strong>🎾 Tennis:</strong> 0-15-30-40-game. Deuce pada 40-40, harus menang 2 poin beruntun. Set: first to 6 games (win by 2). Match: best of 3 sets.</p>
-                    @elseif($current['game_type'] === 'padel')
-                        <p><strong>🎾 Padel:</strong> First to 6 games (win by 2). Tiebreak di 6-6 (first to 7 win by 2). Match: best of 3 sets.</p>
-                    @endif
-                    
-                    <div class="alert alert-info mt-3 mb-0">
-                        <i class="fas fa-lightbulb me-2"></i>
-                        <strong>Tips:</strong> Game akan otomatis selesai dan langsung mencatat ke leaderboard ketika pemenang terdeteksi.
-                    </div>
-                </div>
+            
+            <div class="flex items-center gap-2">
+                <a href="/scoreboard/leaderboard" 
+                   class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-bold transition-colors shadow-sm flex items-center gap-1">
+                    LEADERBOARD <i class="fas fa-arrow-right"></i>
+                </a>
+                
+                <a href="/scoreboard" 
+                   class="text-gray-400 hover:text-gray-600 px-2 py-2 text-xs transition-colors">
+                    Back to Home
+                </a>
             </div>
         </div>
     </div>
 </div>
+    </div>
 
-<style>
-.vs-circle {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
+    <!-- Game Rules Section -->
+    <!-- <div class="mt-12">
+        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
+            <div class="bg-gradient-to-r from-gray-900 to-gray-800 px-8 py-6">
+                <h2 class="text-2xl font-bold text-white">
+                    <i class="fas fa-info-circle mr-3"></i> Game Rules
+                </h2>
+                <p class="text-gray-300 mt-1">
+                    Sistem scoring otomatis untuk {{ strtoupper($current['game_type']) }}
+                </p>
+            </div>
+            
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    @if($current['game_type'] === 'badminton')
+                    <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl border border-orange-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-orange-100 to-red-100 flex items-center justify-center mb-4">
+                            <span class="text-2xl">🏸</span>
+                        </div>
+                        <h4 class="font-bold text-gray-900 mb-2">Badminton Scoring</h4>
+                        <p class="text-gray-600 text-sm">First to 21 points (win by 2), maximum 30 points. Best of 3 sets wins match.</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl border border-orange-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-orange-100 to-red-100 flex items-center justify-center mb-4">
+                            <i class="fas fa-bolt text-orange-500 text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-900 mb-2">Auto Completion</h4>
+                        <p class="text-gray-600 text-sm">Match automatically ends when team wins 2 sets. All stats saved to leaderboard.</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl border border-orange-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-orange-100 to-red-100 flex items-center justify-center mb-4">
+                            <i class="fas fa-chart-bar text-orange-500 text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-900 mb-2">Point System</h4>
+                        <p class="text-gray-600 text-sm">Point per rally win. Service alternates every point.</p>
+                    </div>
+                    
+                    @elseif($current['game_type'] === 'tennis')
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center mb-4">
+                            <span class="text-2xl">🎾</span>
+                        </div>
+                        <h4 class="font-bold text-gray-900 mb-2">Tennis Scoring</h4>
+                        <p class="text-gray-600 text-sm">Points: 0 → 15 → 30 → 40. Deuce at 40-40, win by 2 points.</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center mb-4">
+                            <i class="fas fa-layer-group text-blue-500 text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-900 mb-2">Set Rules</h4>
+                        <p class="text-gray-600 text-sm">First to 6 games (win by 2). Tiebreak at 6-6 games.</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center mb-4">
+                            <i class="fas fa-trophy text-blue-500 text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-900 mb-2">Match Format</h4>
+                        <p class="text-gray-600 text-sm">Best of 3 sets wins match. Championship tiebreak for 3rd set.</p>
+                    </div>
+                    
+                    @elseif($current['game_type'] === 'padel')
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center mb-4">
+                            <span class="text-2xl">🎾</span>
+                        </div>
+                        <h4 class="font-bold text-gray-900 mb-2">Padel Rules</h4>
+                        <p class="text-gray-600 text-sm">First to 6 games (win by 2). Same scoring as tennis (0-15-30-40).</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center mb-4">
+                            <i class="fas fa-bolt text-purple-500 text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-900 mb-2">Tiebreak System</h4>
+                        <p class="text-gray-600 text-sm">At 6-6 games, play tiebreak: first to 7 points (win by 2).</p>
+                    </div>
+                    
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center mb-4">
+                            <i class="fas fa-trophy text-purple-500 text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-gray-900 mb-2">Match Format</h4>
+                        <p class="text-gray-600 text-sm">Best of 3 sets. Service alternates every game.</p>
+                    </div>
+                    @endif
+                </div>
+                
+                <div class="mt-8 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200 p-6">
+                    <div class="flex items-start space-x-4">
+                        <div class="bg-green-100 p-3 rounded-full">
+                            <i class="fas fa-lightbulb text-green-600 text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-900 mb-1">Automatic Scoring System</h4>
+                            <p class="text-gray-700">
+                                Sistem secara otomatis mendeteksi penyelesaian pertandingan berdasarkan aturan permainan. 
+                                Semua statistik pemain dilacak dan disimpan secara real-time untuk analisis performa.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div> -->
+    <div class="p-4 max-w-6xl mx-auto">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-900 to-gray-800 px-4 py-2.5 flex items-center justify-between">
+            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                <i class="fas fa-book-open text-orange-500"></i> Rules
+            </h2>
+            <span class="text-[10px] text-gray-400 font-mono uppercase tracking-wider bg-white/10 px-2 py-0.5 rounded">
+                {{ $current['game_type'] }}
+            </span>
+        </div>
+        
+        <div class="p-3">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                @if($current['game_type'] === 'badminton')
+                <div class="flex gap-3 items-start p-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-orange-50/50 hover:border-orange-100 transition-colors">
+                    <div class="w-7 h-7 rounded bg-white border border-gray-200 flex items-center justify-center shrink-0 mt-0.5 text-orange-500 text-xs">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">Winning Condition</h4>
+                        <p class="text-[10px] text-gray-500 leading-tight mt-0.5">Best of 3 sets. First to 21 points (win by 2, max 30).</p>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 items-start p-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-orange-50/50 hover:border-orange-100 transition-colors">
+                    <div class="w-7 h-7 rounded bg-white border border-gray-200 flex items-center justify-center shrink-0 mt-0.5 text-orange-500 text-xs">
+                        <i class="fas fa-flag-checkered"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">Auto Finish</h4>
+                        <p class="text-[10px] text-gray-500 leading-tight mt-0.5">System auto-ends match when a team secures 2 sets.</p>
+                    </div>
+                </div>
+                
+                <div class="flex gap-3 items-start p-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-orange-50/50 hover:border-orange-100 transition-colors">
+                    <div class="w-7 h-7 rounded bg-white border border-gray-200 flex items-center justify-center shrink-0 mt-0.5 text-orange-500 text-xs">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">Rally Point</h4>
+                        <p class="text-[10px] text-gray-500 leading-tight mt-0.5">Point every rally. Service alternates automatically.</p>
+                    </div>
+                </div>
 
-.timer-display {
-    padding: 10px;
-    background: rgba(13, 110, 253, 0.1);
-    border-radius: 10px;
-    border: 2px solid #0d6efd;
-}
+                @elseif($current['game_type'] === 'tennis')
+                <div class="flex gap-3 items-start p-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-blue-50/50 hover:border-blue-100 transition-colors">
+                    <div class="w-7 h-7 rounded bg-white border border-gray-200 flex items-center justify-center shrink-0 mt-0.5 text-blue-500 text-xs">
+                        <i class="fas fa-list-ol"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">Scoring</h4>
+                        <p class="text-[10px] text-gray-500 leading-tight mt-0.5">0, 15, 30, 40. Deuce at 40-40 (Advantage rule applies).</p>
+                    </div>
+                </div>
 
-.live-timer {
-    margin-top: 15px;
-    animation: pulse 2s infinite;
-}
+                <div class="flex gap-3 items-start p-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-blue-50/50 hover:border-blue-100 transition-colors">
+                    <div class="w-7 h-7 rounded bg-white border border-gray-200 flex items-center justify-center shrink-0 mt-0.5 text-blue-500 text-xs">
+                        <i class="fas fa-layer-group"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">Sets & Games</h4>
+                        <p class="text-[10px] text-gray-500 leading-tight mt-0.5">Best of 3 Sets. First to 6 games wins set (must win by 2).</p>
+                    </div>
+                </div>
 
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
-}
+                <div class="flex gap-3 items-start p-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-blue-50/50 hover:border-blue-100 transition-colors">
+                    <div class="w-7 h-7 rounded bg-white border border-gray-200 flex items-center justify-center shrink-0 mt-0.5 text-blue-500 text-xs">
+                        <i class="fas fa-gavel"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">Tiebreak</h4>
+                        <p class="text-[10px] text-gray-500 leading-tight mt-0.5">Played at 6-6 games. First to 7 points (win by 2).</p>
+                    </div>
+                </div>
 
-.winner-badge, .final-badge {
-    animation: bounce 2s infinite;
-}
+                @elseif($current['game_type'] === 'padel')
+                <div class="flex gap-3 items-start p-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-purple-50/50 hover:border-purple-100 transition-colors">
+                    <div class="w-7 h-7 rounded bg-white border border-gray-200 flex items-center justify-center shrink-0 mt-0.5 text-purple-500 text-xs">
+                        <i class="fas fa-table-tennis"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">Format</h4>
+                        <p class="text-[10px] text-gray-500 leading-tight mt-0.5">Best of 3 sets. Scoring same as Tennis (15/30/40).</p>
+                    </div>
+                </div>
 
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
+                <div class="flex gap-3 items-start p-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-purple-50/50 hover:border-purple-100 transition-colors">
+                    <div class="w-7 h-7 rounded bg-white border border-gray-200 flex items-center justify-center shrink-0 mt-0.5 text-purple-500 text-xs">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">Golden Point</h4>
+                        <p class="text-[10px] text-gray-500 leading-tight mt-0.5">At Deuce (40-40), next point wins the game (No Adv).</p>
+                    </div>
+                </div>
 
-.control-btn {
-    transition: all 0.2s ease;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border: none;
-    padding: 20px;
-    border-radius: 15px;
-}
-
-.control-btn:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-}
-
-.control-btn:active {
-    transform: translateY(1px);
-}
-
-.score-display {
-    transition: all 0.3s;
-}
-
-.score-update {
-    animation: scoreUpdate 0.5s ease;
-}
-
-@keyframes scoreUpdate {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-    100% { transform: scale(1); }
-}
-
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.countdown-box {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 20px;
-    border-radius: 15px;
-    margin-top: 20px;
-}
-</style>
+                <div class="flex gap-3 items-start p-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-purple-50/50 hover:border-purple-100 transition-colors">
+                    <div class="w-7 h-7 rounded bg-white border border-gray-200 flex items-center justify-center shrink-0 mt-0.5 text-purple-500 text-xs">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">Set Tiebreak</h4>
+                        <p class="text-[10px] text-gray-500 leading-tight mt-0.5">At 6-6 games, tiebreak to 7 points determines winner.</p>
+                    </div>
+                </div>
+                @endif
+            </div>
+            
+            <div class="mt-2 pt-2 border-t border-gray-100 flex justify-end">
+                <span class="text-[9px] text-gray-400 flex items-center gap-1">
+                    <i class="fas fa-robot"></i> Auto-Scoring Enabled
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
 
 <script>
-// Function untuk format waktu (detik ke mm:ss)
+// Timer
+const TIMER_KEY = 'match_start_time';
+let timerInterval;
+
 function formatTime(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    const min = Math.floor(seconds / 60);
+    const sec = seconds % 60;
+    return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
 }
 
-// Storage key untuk timer
-const TIMER_STORAGE_KEY = 'match_start_time';
-
-// Hitung durasi dari waktu mulai YANG BENAR
-function calculateDuration() {
-    // Coba ambil waktu mulai dari localStorage (untuk timer client-side)
-    const storedStartTime = localStorage.getItem(TIMER_STORAGE_KEY);
-    
-    if (storedStartTime) {
-        // Gunakan waktu dari localStorage
-        const startTime = parseInt(storedStartTime);
-        const now = Date.now();
-        const durationSeconds = Math.floor((now - startTime) / 1000);
-        return Math.max(0, durationSeconds); // Pastikan tidak negatif
-    } else {
-        // Fallback ke waktu server
-        const startedAt = new Date("{{ $current['started_at'] }}").getTime();
-        const now = new Date().getTime();
-        const durationSeconds = Math.floor((now - startedAt) / 1000);
-        return Math.max(0, durationSeconds);
-    }
-}
-
-// Update timer display
 function updateTimer() {
-    const duration = calculateDuration();
+    const stored = localStorage.getItem(TIMER_KEY);
+    let startTime;
     
-    // Update main timer
-    const matchTimer = document.getElementById('match-timer');
-    if (matchTimer) {
-        matchTimer.textContent = formatTime(duration);
+    if (stored) {
+        startTime = parseInt(stored);
+    } else {
+        startTime = new Date("{{ $current['started_at'] }}").getTime();
+        localStorage.setItem(TIMER_KEY, startTime);
     }
     
-    // Update live timer
-    const liveTimer = document.getElementById('live-timer');
-    if (liveTimer) {
-        liveTimer.textContent = formatTime(duration);
-    }
+    const now = Date.now();
+    const duration = Math.max(0, Math.floor((now - startTime) / 1000));
     
-    // Update final duration
-    const finalDuration = document.getElementById('final-duration');
-    if (finalDuration) {
-        finalDuration.textContent = formatTime(duration);
-    }
+    ['match-timer', 'live-timer'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = formatTime(duration);
+    });
 }
 
-// Reset dan mulai timer dari 0
-function resetTimer() {
-    // Simpan waktu sekarang di localStorage
-    localStorage.setItem(TIMER_STORAGE_KEY, Date.now().toString());
-    
-    // Update waktu mulai di tampilan
-    const now = new Date();
-    const startTimeElement = document.getElementById('start-time');
-    if (startTimeElement) {
-        const hours = now.getHours().toString().padStart(2, '0');
-        const minutes = now.getMinutes().toString().padStart(2, '0');
-        startTimeElement.textContent = `${hours}:${minutes}`;
+// Point animation
+function addPoint(team) {
+    const scoreEl = document.getElementById(`score${team}`);
+    if (scoreEl) {
+        scoreEl.classList.add('scale-110');
+        setTimeout(() => scoreEl.classList.remove('scale-110'), 300);
     }
     
-    // Update display
-    updateTimer();
-    
-    // Tampilkan pesan
-    alert('Timer telah direset ke 00:00');
+    setTimeout(() => {
+        const form = document.getElementById(`pointForm${team}`);
+        if (form) form.submit();
+    }, 200);
 }
 
-// Animation untuk point
-function addPointAnimation(team) {
-    const scoreElement = document.getElementById(`score${team}`);
-    if (scoreElement) {
-        scoreElement.classList.remove('score-update');
-        void scoreElement.offsetWidth; // Trigger reflow
-        scoreElement.classList.add('score-update');
-        
-        setTimeout(() => {
-            scoreElement.classList.remove('score-update');
-        }, 500);
-    }
-}
-
-// Auto-redirect countdown jika game selesai
+// Auto-redirect
 @if(isset($current['winner']))
 let countdown = 5;
-const countdownElement = document.getElementById('countdown');
+const countdownEl = document.getElementById('countdown');
 const countdownInterval = setInterval(() => {
     countdown--;
-    if (countdownElement) {
-        countdownElement.textContent = countdown;
-    }
+    if (countdownEl) countdownEl.textContent = countdown;
     if (countdown <= 0) {
         clearInterval(countdownInterval);
         window.location.href = '/scoreboard/leaderboard';
@@ -723,44 +634,97 @@ const countdownInterval = setInterval(() => {
 }, 1000);
 @endif
 
-// Start timer ketika page load
+// Initialize
 document.addEventListener('DOMContentLoaded', function() {
-    // Cek apakah ini match baru (skor masih 0-0)
-    const isNewMatch = {{ $current['pointsA'] }} === 0 && {{ $current['pointsB'] }} === 0;
-    
-    // Cek apakah game sudah selesai
+    const isNew = {{ $current['pointsA'] }} === 0 && {{ $current['pointsB'] }} === 0;
     const isFinished = {{ isset($current['winner']) ? 'true' : 'false' }};
     
-    if (isNewMatch && !isFinished) {
-        // Jika match baru, reset timer ke 0
-        localStorage.setItem(TIMER_STORAGE_KEY, Date.now().toString());
-        
-        // Update waktu mulai di tampilan
-        const now = new Date();
-        const startTimeElement = document.getElementById('start-time');
-        if (startTimeElement) {
-            const hours = now.getHours().toString().padStart(2, '0');
-            const minutes = now.getMinutes().toString().padStart(2, '0');
-            startTimeElement.textContent = `${hours}:${minutes}`;
-        }
-    } else if (!localStorage.getItem(TIMER_STORAGE_KEY)) {
-        // Jika tidak ada timer di localStorage, set berdasarkan waktu server
-        const startedAt = new Date("{{ $current['started_at'] }}").getTime();
-        localStorage.setItem(TIMER_STORAGE_KEY, startedAt.toString());
+    if (isNew && !isFinished) {
+        localStorage.setItem(TIMER_KEY, Date.now().toString());
     }
     
-    // Start timer
     updateTimer();
-    setInterval(updateTimer, 1000); // Update setiap detik
+    timerInterval = setInterval(updateTimer, 1000);
 });
 
-// Clear timer storage ketika pindah halaman (opsional)
+// Cleanup
 window.addEventListener('beforeunload', function() {
-    // Jangan clear jika game masih berlangsung
-    const isFinished = {{ isset($current['winner']) ? 'true' : 'false' }};
-    if (isFinished) {
-        localStorage.removeItem(TIMER_STORAGE_KEY);
-    }
+    clearInterval(timerInterval);
+    @if(isset($current['winner']))
+    localStorage.removeItem(TIMER_KEY);
+    @endif
 });
 </script>
+
+<style>
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+.scale-110 {
+    transform: scale(1.1);
+    transition: transform 0.3s ease;
+}
+
+.active\:scale-95:active {
+    transform: scale(0.95);
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.transition-all {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+}
+
+.group:hover .group-hover\:translate-x-1 {
+    transform: translateX(0.25rem);
+}
+
+.font-mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.hover\:shadow-md:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.hover\:shadow-lg:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+}
+
+/* Smooth transitions for progress bars */
+.transition-all {
+    transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #f97316, #ef4444);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #ea580c, #dc2626);
+}
+</style>
 @endsection
