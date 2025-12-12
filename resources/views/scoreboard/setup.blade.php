@@ -309,7 +309,7 @@
     </div>
 
     <!-- Additional Info Section -->
-    <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <!-- <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-100 to-blue-50 flex items-center justify-center mb-4">
                 <i class="fas fa-gamepad text-blue-500 text-xl"></i>
@@ -333,7 +333,7 @@
             <h4 class="font-bold text-gray-900 mb-2">Auto Tracking</h4>
             <p class="text-gray-600 text-sm">Semua pertandingan dan statistik akan tercatat otomatis untuk analisis mendalam.</p>
         </div>
-    </div>
+    </div> -->
 </div>
 
 @endsection

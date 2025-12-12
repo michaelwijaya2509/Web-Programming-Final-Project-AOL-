@@ -361,7 +361,7 @@
     </div>
 
     <!-- Additional Info Section -->
-    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <!-- <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
         <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
             <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-yellow-100 to-yellow-50 flex items-center justify-center mb-4">
                 <i class="fas fa-crown text-yellow-500 text-xl"></i>
@@ -385,7 +385,7 @@
             <h4 class="font-bold text-gray-900 mb-2">Achievement Badges</h4>
             <p class="text-gray-600 text-sm">Lencana pencapaian berdasarkan performa dan tingkat pengalaman pemain.</p>
         </div>
-    </div>
+    </div> -->
 </div>
 
 @endsection
