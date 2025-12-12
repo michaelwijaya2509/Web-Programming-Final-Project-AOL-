@@ -13,12 +13,8 @@ return new class extends Migration
     {
         Schema::create('courts', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100);
-            // jenis lapangan: bisa kamu tambah kalau perlu
-            $table->enum('type', ['badminton', 'tenis', 'padel','pickleball', 'lainnya'])->default('badminton');
-            $table->string('location', 255)->nullable();
-            $table->text('description')->nullable();
-            $table->decimal('price_per_hour', 10, 2)->default(0);
+            $table->foreignId('venue_id')->constrained()->onDelete('cascade');
+            $table->string('court_name');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

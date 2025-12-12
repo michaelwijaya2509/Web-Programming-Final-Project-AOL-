@@ -13,25 +13,24 @@ return new class extends Migration
     {
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
-
-            // relasi ke users & courts
             $table->foreignId('user_id')
                 ->constrained()
-                ->onDelete('cascade');
+                ->onDelete('cascade')->nullable(false);
 
+            $table->foreignId('venue_id')
+                ->constrained()
+                ->onDelete('cascade')->nullable(false);
+            
             $table->foreignId('court_id')
                 ->constrained()
-                ->onDelete('cascade');
+                ->onDelete('cascade')->nullable(false);
 
-            $table->date('booking_date');      // tanggal main
-            $table->time('start_time');        // jam mulai
-            $table->time('end_time');          // jam selesai
-
-            // durasi (jam), misal 1.5 jam
-            $table->decimal('duration_hour', 4, 2);
+            $table->date('booking_date')->nullable(false);      // tanggal main
+            $table->time('start_time')->nullable(false);        // jam mulai
+            $table->time('end_time')->nullable(false);          // jam selesai
 
             // total harga (duration * price_per_hour)
-            $table->decimal('total_price', 10, 2);
+            $table->decimal('total_price', 10, 2)->nullable(false);
 
             // status booking
             $table->enum('status', [

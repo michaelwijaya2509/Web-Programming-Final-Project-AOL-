@@ -11,11 +11,11 @@ class Booking extends Model
 
     protected $fillable = [
         'user_id',
+        'venue_id',
         'court_id',
         'booking_date',
         'start_time',
         'end_time',
-        'duration_hour',
         'total_price',
         'status',
         'notes',
@@ -34,6 +34,11 @@ class Booking extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function venue()
+    {
+        return $this->belongsTo(Venue::class);
+    }
+    
     public function court()
     {
         return $this->belongsTo(Court::class);
@@ -42,11 +47,6 @@ class Booking extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
-    }
-
-    public function rating()
-    {
-        return $this->hasOne(Rating::class);
     }
 
     public function isPaid(): bool
