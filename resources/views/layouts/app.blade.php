@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title') - Sports Arena Booking</title>
+    <title>@yield('title') - Meraket Booking</title>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <!-- Bootstrap 5 CSS -->
@@ -16,11 +16,11 @@
     <!-- Custom CSS -->
     <style>
         :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --primary-light: #3b82f6;
+            --primary: #FF6700;
+            --primary-dark: #E65C00;
+            --primary-light: #FF9F66;
             --secondary: #64748b;
-            --accent: #f59e0b;
+            --accent: #2563eb;
             --success: #10b981;
             --danger: #ef4444;
             --dark: #0f172a;
@@ -756,7 +756,7 @@
                     <div class="brand-logo">
                         <i class="bi bi-trophy-fill"></i>
                     </div>
-                    <span class="brand-name">SportsArena</span>
+                    <span class="brand-name">Meraket</span>
                 </a>
 
                 <!-- Desktop Navigation Links - Center -->
@@ -972,7 +972,7 @@
                     <div class="footer-brand">
                         <a href="/" class="footer-logo">
                             <i class="bi bi-trophy-fill"></i>
-                            <span>SportsArena</span>
+                            <span>Meraket</span>
                         </a>
                         <p class="footer-description">
                             Platform booking lapangan olahraga premium dengan pengalaman terbaik untuk atlet dan
@@ -1079,7 +1079,7 @@
                             <i class="bi bi-envelope contact-icon"></i>
                             <div class="contact-info">
                                 <div class="contact-label">Email</div>
-                                <a href="mailto:info@sportsarena.com" class="contact-value">info@sportsarena.com</a>
+                                <a href="mailto:info@meraket.com" class="contact-value">info@meraket.com</a>
                             </div>
                         </div>
                     </div>
@@ -1089,7 +1089,7 @@
             <!-- Footer Bottom -->
             <div class="footer-bottom">
                 <div class="copyright">
-                    &copy; 2024 SportsArena. All rights reserved.
+                    &copy; 2025 Meraket. All rights reserved.
                 </div>
                 <div class="legal-links">
                     <a href="/privacy" class="legal-link">Privacy Policy</a>
