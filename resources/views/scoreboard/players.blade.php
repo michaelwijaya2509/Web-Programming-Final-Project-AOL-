@@ -61,7 +61,7 @@
                                 </div>
                                 <input type="text" 
                                        name="name" 
-                                       class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
+                                       class="pl-10 w-full px-5 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition"
                                        placeholder="Masukkan nama pemain"
                                        required
                                        maxlength="50">

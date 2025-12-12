@@ -166,6 +166,33 @@
                                     </div>
                                 </label>
                             </div>
+
+                            <!-- Pickleball Option -->
+                            <div class="group cursor-pointer">
+                                <input class="hidden" type="radio" name="game_type" id="pickleball" value="pickleball" required>
+                                <label for="pickleball" 
+                                       class="flex items-center border border-gray-200 rounded-lg p-4 hover:border-orange-300 hover:shadow-md transition-all duration-300 group-has-[:checked]:border-orange-500 group-has-[:checked]:bg-gradient-to-r group-has-[:checked]:from-orange-50 group-has-[:checked]:to-red-50">
+                                    <div class="flex-shrink-0 mr-4">
+                                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-orange-500 to-red-600 flex items-center justify-center">
+                                            <i class="fas fa-table-tennis text-white text-xl"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex-grow">
+                                        <div class="flex items-center mb-1">
+                                            <h4 class="text-lg font-bold text-gray-900 mr-3">🏓 Pickleball</h4>
+                                            <span class="bg-green-100 text-green-800 text-xs font-semibold px-2 py-1 rounded-full">
+                                                New
+                                            </span>
+                                        </div>
+                                        <p class="text-gray-600 text-sm">First to 11 (win by 2), serve team scores only</p>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="w-6 h-6 rounded-full border-2 border-gray-300 group-has-[:checked]:border-orange-500 group-has-[:checked]:bg-orange-500 flex items-center justify-center">
+                                            <i class="fas fa-check text-white text-xs hidden group-has-[:checked]:block"></i>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
                         </div>
                     </div>
                     

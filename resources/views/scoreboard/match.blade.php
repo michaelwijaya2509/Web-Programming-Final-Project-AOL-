@@ -24,24 +24,6 @@
 <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-16 relative z-30">
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
         
-        <!-- Card Header -->
-        <!-- <div class="bg-gradient-to-r from-orange-500 to-red-500 px-8 py-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="text-2xl font-bold text-white">
-                        <i class="fas fa-chart-line mr-3"></i> Live Scoreboard
-                    </h2>
-                    <p class="text-orange-100 mt-1">
-                        Pantau pertandingan secara real-time. Tambahkan poin dan kelola skor dengan mudah.
-                    </p>
-                </div>
-                <div class="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2">
-                    <span class="text-sm text-white/80">Match Timer</span>
-                    <div class="text-2xl font-bold text-white text-center" id="match-timer">00:00</div>
-                </div>
-            </div>
-        </div> -->
-
         <!-- Card Body -->
         <div class="p-4 max-w-6xl mx-auto">
     <div class="mb-4">
@@ -158,6 +140,65 @@
                         @if($current['in_tiebreak'])
                         <div class="text-center bg-yellow-50 text-yellow-700 text-[10px] font-bold py-1 rounded">Tiebreak: {{ $current['tiebreak_points']['A'] }}</div>
                         @endif
+
+                    @elseif($current['game_type'] === 'pickleball')
+                        <!-- Pickleball Display -->
+                        <div class="mb-3">
+                            <div class="flex justify-between items-center mb-1">
+                                <div>
+                                    <div class="text-[10px] text-gray-500">GAMES</div>
+                                    <div class="text-xl font-bold text-gray-900">{{ $current['pickleball']['gamesA'] }}</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-[10px] text-gray-500">POINTS</div>
+                                    <div class="text-4xl font-bold text-orange-600">{{ $current['pickleball']['scoreA'] }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-gray-500">SETS</div>
+                                    <div class="text-xl font-bold text-gray-900">{{ $current['pickleball']['setsA'] }}</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Progress bar for points -->
+                            <div class="w-full bg-gray-100 rounded-full h-1.5 mb-2">
+                                <div class="h-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 transition-all duration-700 ease-out" 
+                                     style="width: {{ min(100, ($current['pickleball']['scoreA'] / 11) * 100) }}%">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Server Indicator -->
+                        @php
+                            $isServingA = !isset($current['winner']) && $current['pickleball']['server'] === 'A';
+                            $serverText = '';
+                            if ($isServingA) {
+                                if ($current['mode'] === 'single') {
+                                    $serverText = 'Serving';
+                                } else {
+                                    if ($current['pickleball']['first_server']) {
+                                        $serverText = 'Server 1';
+                                    } else {
+                                        $serverText = 'Server 2';
+                                    }
+                                }
+                            }
+                        @endphp
+                        
+                        @if($isServingA)
+                        <div class="bg-gradient-to-r from-orange-100 to-red-100 border border-orange-200 rounded-md p-1.5 mb-2">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <div class="w-5 h-5 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center">
+                                    <i class="fas fa-circle text-white text-[8px]"></i>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-xs font-bold text-orange-700">{{ $serverText }}</div>
+                                    @if($current['mode'] === 'single')
+                                    <div class="text-[10px] text-orange-600">({{ ucfirst($current['pickleball']['side']) }} side)</div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                     @endif
 
                     <div class="mt-2 pt-2 border-t border-gray-100 flex flex-wrap gap-1.5">
@@ -267,6 +308,65 @@
                         @if($current['in_tiebreak'])
                         <div class="text-center bg-yellow-50 text-yellow-700 text-[10px] font-bold py-1 rounded">Tiebreak: {{ $current['tiebreak_points']['B'] }}</div>
                         @endif
+
+                    @elseif($current['game_type'] === 'pickleball')
+                        <!-- Pickleball Display -->
+                        <div class="mb-3">
+                            <div class="flex justify-between items-center mb-1">
+                                <div>
+                                    <div class="text-[10px] text-gray-500">GAMES</div>
+                                    <div class="text-xl font-bold text-gray-900">{{ $current['pickleball']['gamesB'] }}</div>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-[10px] text-gray-500">POINTS</div>
+                                    <div class="text-4xl font-bold text-blue-600">{{ $current['pickleball']['scoreB'] }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-[10px] text-gray-500">SETS</div>
+                                    <div class="text-xl font-bold text-gray-900">{{ $current['pickleball']['setsB'] }}</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Progress bar for points -->
+                            <div class="w-full bg-gray-100 rounded-full h-1.5 mb-2">
+                                <div class="h-1.5 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-700 ease-out" 
+                                     style="width: {{ min(100, ($current['pickleball']['scoreB'] / 11) * 100) }}%">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Server Indicator -->
+                        @php
+                            $isServingB = !isset($current['winner']) && $current['pickleball']['server'] === 'B';
+                            $serverText = '';
+                            if ($isServingB) {
+                                if ($current['mode'] === 'single') {
+                                    $serverText = 'Serving';
+                                } else {
+                                    if ($current['pickleball']['first_server']) {
+                                        $serverText = 'Server 1';
+                                    } else {
+                                        $serverText = 'Server 2';
+                                    }
+                                }
+                            }
+                        @endphp
+                        
+                        @if($isServingB)
+                        <div class="bg-gradient-to-r from-blue-100 to-blue-100 border border-blue-200 rounded-md p-1.5 mb-2">
+                            <div class="flex items-center justify-center gap-1.5">
+                                <div class="w-5 h-5 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center">
+                                    <i class="fas fa-circle text-white text-[8px]"></i>
+                                </div>
+                                <div class="text-center">
+                                    <div class="text-xs font-bold text-blue-700">{{ $serverText }}</div>
+                                    @if($current['mode'] === 'single')
+                                    <div class="text-[10px] text-blue-600">({{ ucfirst($current['pickleball']['side']) }} side)</div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        @endif
                     @endif
 
                     <div class="mt-2 pt-2 border-t border-gray-100 flex flex-wrap gap-1.5">
@@ -350,113 +450,6 @@
     </div>
 
     <!-- Game Rules Section -->
-    <!-- <div class="mt-12">
-        <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200">
-            <div class="bg-gradient-to-r from-gray-900 to-gray-800 px-8 py-6">
-                <h2 class="text-2xl font-bold text-white">
-                    <i class="fas fa-info-circle mr-3"></i> Game Rules
-                </h2>
-                <p class="text-gray-300 mt-1">
-                    Sistem scoring otomatis untuk {{ strtoupper($current['game_type']) }}
-                </p>
-            </div>
-            
-            <div class="p-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    @if($current['game_type'] === 'badminton')
-                    <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl border border-orange-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-orange-100 to-red-100 flex items-center justify-center mb-4">
-                            <span class="text-2xl">🏸</span>
-                        </div>
-                        <h4 class="font-bold text-gray-900 mb-2">Badminton Scoring</h4>
-                        <p class="text-gray-600 text-sm">First to 21 points (win by 2), maximum 30 points. Best of 3 sets wins match.</p>
-                    </div>
-                    
-                    <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl border border-orange-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-orange-100 to-red-100 flex items-center justify-center mb-4">
-                            <i class="fas fa-bolt text-orange-500 text-xl"></i>
-                        </div>
-                        <h4 class="font-bold text-gray-900 mb-2">Auto Completion</h4>
-                        <p class="text-gray-600 text-sm">Match automatically ends when team wins 2 sets. All stats saved to leaderboard.</p>
-                    </div>
-                    
-                    <div class="bg-gradient-to-br from-orange-50 to-red-50 rounded-xl border border-orange-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-orange-100 to-red-100 flex items-center justify-center mb-4">
-                            <i class="fas fa-chart-bar text-orange-500 text-xl"></i>
-                        </div>
-                        <h4 class="font-bold text-gray-900 mb-2">Point System</h4>
-                        <p class="text-gray-600 text-sm">Point per rally win. Service alternates every point.</p>
-                    </div>
-                    
-                    @elseif($current['game_type'] === 'tennis')
-                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center mb-4">
-                            <span class="text-2xl">🎾</span>
-                        </div>
-                        <h4 class="font-bold text-gray-900 mb-2">Tennis Scoring</h4>
-                        <p class="text-gray-600 text-sm">Points: 0 → 15 → 30 → 40. Deuce at 40-40, win by 2 points.</p>
-                    </div>
-                    
-                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center mb-4">
-                            <i class="fas fa-layer-group text-blue-500 text-xl"></i>
-                        </div>
-                        <h4 class="font-bold text-gray-900 mb-2">Set Rules</h4>
-                        <p class="text-gray-600 text-sm">First to 6 games (win by 2). Tiebreak at 6-6 games.</p>
-                    </div>
-                    
-                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl border border-blue-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-100 to-indigo-100 flex items-center justify-center mb-4">
-                            <i class="fas fa-trophy text-blue-500 text-xl"></i>
-                        </div>
-                        <h4 class="font-bold text-gray-900 mb-2">Match Format</h4>
-                        <p class="text-gray-600 text-sm">Best of 3 sets wins match. Championship tiebreak for 3rd set.</p>
-                    </div>
-                    
-                    @elseif($current['game_type'] === 'padel')
-                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center mb-4">
-                            <span class="text-2xl">🎾</span>
-                        </div>
-                        <h4 class="font-bold text-gray-900 mb-2">Padel Rules</h4>
-                        <p class="text-gray-600 text-sm">First to 6 games (win by 2). Same scoring as tennis (0-15-30-40).</p>
-                    </div>
-                    
-                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center mb-4">
-                            <i class="fas fa-bolt text-purple-500 text-xl"></i>
-                        </div>
-                        <h4 class="font-bold text-gray-900 mb-2">Tiebreak System</h4>
-                        <p class="text-gray-600 text-sm">At 6-6 games, play tiebreak: first to 7 points (win by 2).</p>
-                    </div>
-                    
-                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-6 shadow-sm hover:shadow-md transition-shadow">
-                        <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-purple-100 to-pink-100 flex items-center justify-center mb-4">
-                            <i class="fas fa-trophy text-purple-500 text-xl"></i>
-                        </div>
-                        <h4 class="font-bold text-gray-900 mb-2">Match Format</h4>
-                        <p class="text-gray-600 text-sm">Best of 3 sets. Service alternates every game.</p>
-                    </div>
-                    @endif
-                </div>
-                
-                <div class="mt-8 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200 p-6">
-                    <div class="flex items-start space-x-4">
-                        <div class="bg-green-100 p-3 rounded-full">
-                            <i class="fas fa-lightbulb text-green-600 text-xl"></i>
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-gray-900 mb-1">Automatic Scoring System</h4>
-                            <p class="text-gray-700">
-                                Sistem secara otomatis mendeteksi penyelesaian pertandingan berdasarkan aturan permainan. 
-                                Semua statistik pemain dilacak dan disimpan secara real-time untuk analisis performa.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
     <div class="p-4 max-w-6xl mx-auto">
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
         <div class="bg-gradient-to-r from-gray-900 to-gray-800 px-4 py-2.5 flex items-center justify-between">
@@ -560,6 +553,44 @@
                     <div>
                         <h4 class="text-xs font-bold text-gray-900">Set Tiebreak</h4>
                         <p class="text-[10px] text-gray-500 leading-tight mt-0.5">At 6-6 games, tiebreak to 7 points determines winner.</p>
+                    </div>
+                </div>
+
+                @elseif($current['game_type'] === 'pickleball')
+                <!-- Pickleball Rules -->
+                <div class="flex gap-3 items-start p-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-green-50/50 hover:border-green-100 transition-colors">
+                    <div class="w-7 h-7 rounded bg-white border border-gray-200 flex items-center justify-center shrink-0 mt-0.5 text-green-500 text-xs">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">Winning Condition</h4>
+                        <p class="text-[10px] text-gray-500 leading-tight mt-0.5">Best of 3 games. First to 11 points (win by 2).</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 items-start p-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-green-50/50 hover:border-green-100 transition-colors">
+                    <div class="w-7 h-7 rounded bg-white border border-gray-200 flex items-center justify-center shrink-0 mt-0.5 text-green-500 text-xs">
+                        <i class="fas fa-tennis-ball"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">Scoring System</h4>
+                        <p class="text-[10px] text-gray-500 leading-tight mt-0.5">Only serving team scores points. Side-out occurs when receiving team wins rally.</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 items-start p-2 rounded-lg border border-gray-100 bg-gray-50 hover:bg-green-50/50 hover:border-green-100 transition-colors">
+                    <div class="w-7 h-7 rounded bg-white border border-gray-200 flex items-center justify-center shrink-0 mt-0.5 text-green-500 text-xs">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">Serve Rotation</h4>
+                        <p class="text-[10px] text-gray-500 leading-tight mt-0.5">
+                            @if($current['mode'] === 'single')
+                            Serve alternates sides (right/left) on each point.
+                            @else
+                            Both players serve before side-out. Server 1 → Server 2 → Side-out.
+                            @endif
+                        </p>
                     </div>
                 </div>
                 @endif
