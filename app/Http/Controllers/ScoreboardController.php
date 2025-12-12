@@ -41,7 +41,7 @@ class ScoreboardController extends Controller
     public function saveSetup(Request $request)
     {
         $request->validate([
-            'game_type' => 'required|in:badminton,tennis,padel',
+            'game_type' => 'required|in:badminton,tennis,padel,pickleball', // Tambah pickleball
             'mode' => 'required|in:single,double'
         ]);
 
@@ -63,165 +63,101 @@ class ScoreboardController extends Controller
     }
 
     // prepare a new match (smart shuffle + init rules state)
-    // public function match()
-    // {
-    //     $players = session('players', []);
-    //     if (count($players) < 2) {
-    //         return redirect('/scoreboard')->with('error', 'Butuh minimal 2 pemain.');
-    //     }
+    public function match()
+    {
+        $players = session('players', []);
+        if (count($players) < 2) {
+            return redirect('/scoreboard')->with('error', 'Butuh minimal 2 pemain.');
+        }
 
-    //     // Check if there's an active match
-    //     $current = session('current_match');
-    //     if ($current && !isset($current['winner'])) {
-    //         // Continue existing match
-    //         return view('scoreboard.match', [
-    //             'teamA' => $current['teamA'],
-    //             'teamB' => $current['teamB'],
-    //             'current' => $current
-    //         ]);
-    //     }
+        // Check if there's an active match
+        $current = session('current_match');
+        if ($current && !isset($current['winner'])) {
+            // Continue existing match - JANGAN reset timer
+            return view('scoreboard.match', [
+                'teamA' => $current['teamA'],
+                'teamB' => $current['teamB'],
+                'current' => $current
+            ]);
+        }
 
-    //     // Create new match
-    //     $shuffled = $players;
-    //     shuffle($shuffled);
+        // Create new match - RESET timer
+        $shuffled = $players;
+        shuffle($shuffled);
 
-    //     $mode = session('mode', 'single');
-    //     $game_type = session('game_type', 'badminton');
+        $mode = session('mode', 'single');
+        $game_type = session('game_type', 'badminton');
 
-    //     // build teams based on mode
-    //     if ($mode === 'single') {
-    //         $teamA = [$shuffled[0]];
-    //         $teamB = [$shuffled[1] ?? null];
-    //     } else {
-    //         $teamA = [$shuffled[0], $shuffled[1] ?? null];
-    //         $teamB = [$shuffled[2] ?? null, $shuffled[3] ?? null];
-    //     }
+        // build teams based on mode
+        if ($mode === 'single') {
+            $teamA = [$shuffled[0]];
+            $teamB = [$shuffled[1] ?? null];
+        } else {
+            $teamA = [$shuffled[0], $shuffled[1] ?? null];
+            $teamB = [$shuffled[2] ?? null, $shuffled[3] ?? null];
+        }
 
-    //     // initialize current match structure depending on game type
-    //     $current = [
-    //         'teamA' => array_values(array_filter($teamA)),
-    //         'teamB' => array_values(array_filter($teamB)),
-    //         'pointsA' => 0,
-    //         'pointsB' => 0,
-    //         'game_type' => $game_type,
-    //         'mode' => $mode,
-    //         'winner' => null,
-    //         'finished' => false,
-    //         'started_at' => now()->toDateTimeString(),
-    //         'started_timestamp' => now()->timestamp, // Untuk perhitungan durasi
-    //     ];
+        // initialize current match structure depending on game type
+        $current = [
+            'teamA' => array_values(array_filter($teamA)),
+            'teamB' => array_values(array_filter($teamB)),
+            'pointsA' => 0,
+            'pointsB' => 0,
+            'game_type' => $game_type,
+            'mode' => $mode,
+            'winner' => null,
+            'finished' => false,
+            'started_at' => now()->toDateTimeString(),
+            'started_timestamp' => now()->timestamp, // TIMESTAMP SEKARANG
+        ];
 
-    //     if ($game_type === 'padel') {
-    //         $current['sets'] = [
-    //             'A' => [0, 0, 0],
-    //             'B' => [0, 0, 0],
-    //         ];
-    //         $current['current_set_index'] = 0;
-    //         $current['in_tiebreak'] = false;
-    //         $current['tiebreak_points'] = ['A' => 0, 'B' => 0];
-    //         $current['best_of_sets'] = 3;
-    //     }
+        if ($game_type === 'padel') {
+            $current['sets'] = [
+                'A' => [0, 0, 0],
+                'B' => [0, 0, 0],
+            ];
+            $current['current_set_index'] = 0;
+            $current['in_tiebreak'] = false;
+            $current['tiebreak_points'] = ['A' => 0, 'B' => 0];
+            $current['best_of_sets'] = 3;
+        }
 
-    //     if ($game_type === 'tennis') {
-    //         $current['tennis'] = [
-    //             'scoreA' => 0,
-    //             'scoreB' => 0,
-    //             'adv' => null,
-    //             'gamesA' => 0,
-    //             'gamesB' => 0,
-    //             'setsA' => 0,
-    //             'setsB' => 0,
-    //         ];
-    //     }
+        if ($game_type === 'tennis') {
+            $current['tennis'] = [
+                'scoreA' => 0,
+                'scoreB' => 0,
+                'adv' => null,
+                'gamesA' => 0,
+                'gamesB' => 0,
+                'setsA' => 0,
+                'setsB' => 0,
+            ];
+        }
 
-    //     session(['current_match' => $current]);
+        // Inisialisasi untuk Pickleball
+        if ($game_type === 'pickleball') {
+            $current['pickleball'] = [
+                'scoreA' => 0,
+                'scoreB' => 0,
+                'server' => 'A', // Team yang serving
+                'server_number' => 1, // Server 1 atau 2 (untuk double)
+                'first_server' => true, // Apakah ini server pertama di tim ini
+                'gamesA' => 0,
+                'gamesB' => 0,
+                'setsA' => 0,
+                'setsB' => 0,
+                'side' => 'right', // Posisi server: right atau left
+            ];
+        }
 
-    //     return view('scoreboard.match', [
-    //         'teamA' => $current['teamA'],
-    //         'teamB' => $current['teamB'],
-    //         'current' => $current
-    //     ]);
-    // }
-    // prepare a new match (smart shuffle + init rules state)
-public function match()
-{
-    $players = session('players', []);
-    if (count($players) < 2) {
-        return redirect('/scoreboard')->with('error', 'Butuh minimal 2 pemain.');
-    }
+        session(['current_match' => $current]);
 
-    // Check if there's an active match
-    $current = session('current_match');
-    if ($current && !isset($current['winner'])) {
-        // Continue existing match - JANGAN reset timer
         return view('scoreboard.match', [
             'teamA' => $current['teamA'],
             'teamB' => $current['teamB'],
             'current' => $current
         ]);
     }
-
-    // Create new match - RESET timer
-    $shuffled = $players;
-    shuffle($shuffled);
-
-    $mode = session('mode', 'single');
-    $game_type = session('game_type', 'badminton');
-
-    // build teams based on mode
-    if ($mode === 'single') {
-        $teamA = [$shuffled[0]];
-        $teamB = [$shuffled[1] ?? null];
-    } else {
-        $teamA = [$shuffled[0], $shuffled[1] ?? null];
-        $teamB = [$shuffled[2] ?? null, $shuffled[3] ?? null];
-    }
-
-    // initialize current match structure depending on game type
-    $current = [
-        'teamA' => array_values(array_filter($teamA)),
-        'teamB' => array_values(array_filter($teamB)),
-        'pointsA' => 0,
-        'pointsB' => 0,
-        'game_type' => $game_type,
-        'mode' => $mode,
-        'winner' => null,
-        'finished' => false,
-        'started_at' => now()->toDateTimeString(),
-        'started_timestamp' => now()->timestamp, // TIMESTAMP SEKARANG
-    ];
-
-    if ($game_type === 'padel') {
-        $current['sets'] = [
-            'A' => [0, 0, 0],
-            'B' => [0, 0, 0],
-        ];
-        $current['current_set_index'] = 0;
-        $current['in_tiebreak'] = false;
-        $current['tiebreak_points'] = ['A' => 0, 'B' => 0];
-        $current['best_of_sets'] = 3;
-    }
-
-    if ($game_type === 'tennis') {
-        $current['tennis'] = [
-            'scoreA' => 0,
-            'scoreB' => 0,
-            'adv' => null,
-            'gamesA' => 0,
-            'gamesB' => 0,
-            'setsA' => 0,
-            'setsB' => 0,
-        ];
-    }
-
-    session(['current_match' => $current]);
-
-    return view('scoreboard.match', [
-        'teamA' => $current['teamA'],
-        'teamB' => $current['teamB'],
-        'current' => $current
-    ]);
-}
 
     // route to add a point to the current match, $team is 'A' or 'B'
     public function addPoint(Request $request)
@@ -244,6 +180,8 @@ public function match()
             $this->tennisPoint($current, $team);
         } elseif ($game_type === 'padel') {
             $this->padelPoint($current, $team);
+        } elseif ($game_type === 'pickleball') {
+            $this->pickleballPoint($current, $team); // Tambah pickleball
         }
 
         // Check if game is finished (winner detected)
@@ -288,6 +226,14 @@ public function match()
                     if (($current['sets']['B'][$i] ?? 0) > ($current['sets']['A'][$i] ?? 0)) $setsB++;
                 }
                 $current['winner'] = $setsA > $setsB ? 'A' : 'B';
+            } elseif ($current['game_type'] === 'pickleball') {
+                if ($current['pickleball']['gamesA'] > $current['pickleball']['gamesB']) {
+                    $current['winner'] = 'A';
+                } elseif ($current['pickleball']['gamesB'] > $current['pickleball']['gamesA']) {
+                    $current['winner'] = 'B';
+                } else {
+                    $current['winner'] = $current['pickleball']['scoreA'] > $current['pickleball']['scoreB'] ? 'A' : 'B';
+                }
             }
         }
 
@@ -570,5 +516,117 @@ public function match()
         } else {
             $current['current_set_index']++;
         }
+    }
+
+    /* ----------------------------
+       Pickleball scoring functions
+       ---------------------------- */
+    
+    // Pickleball scoring system (USAPA rules)
+    protected function pickleballPoint(array &$current, string $team)
+    {
+        $state = &$current['pickleball'];
+        
+        // Hanya team yang serving yang bisa mencetak poin
+        if ($team !== $state['server']) {
+            // Side out - pindah serve ke tim lain
+            $this->pickleballSideOut($current);
+            return;
+        }
+        
+        // Tim serving mencetak poin
+        if ($state['server'] === 'A') {
+            $state['scoreA']++;
+        } else {
+            $state['scoreB']++;
+        }
+        
+        // Cek apakah game sudah dimenangkan (first to 11, win by 2)
+        if ($this->checkPickleballGameWin($current)) {
+            return;
+        }
+        
+        // Rotasi server (untuk double) atau pindah side
+        $this->pickleballRotateServer($current);
+    }
+    
+    protected function pickleballRotateServer(array &$current)
+    {
+        $state = &$current['pickleball'];
+        
+        if ($current['mode'] === 'single') {
+            // Untuk single, cukup ganti sisi serve
+            $state['side'] = ($state['side'] === 'right') ? 'left' : 'right';
+        } else {
+            // Untuk double
+            if ($state['first_server']) {
+                // Server pertama kehilangan serve, server kedua sekarang serve
+                $state['first_server'] = false;
+                $state['server_number'] = 2;
+                $state['side'] = ($state['side'] === 'right') ? 'left' : 'right';
+            } else {
+                // Server kedua kehilangan serve, side out
+                $this->pickleballSideOut($current);
+            }
+        }
+    }
+    
+    protected function pickleballSideOut(array &$current)
+    {
+        $state = &$current['pickleball'];
+        
+        // Pindah serve ke tim lain
+        $state['server'] = ($state['server'] === 'A') ? 'B' : 'A';
+        $state['first_server'] = true;
+        $state['server_number'] = 1;
+        
+        // Reset sisi serve ke kanan untuk team baru
+        $state['side'] = 'right';
+    }
+    
+    protected function checkPickleballGameWin(array &$current): bool
+    {
+        $state = &$current['pickleball'];
+        $scoreA = $state['scoreA'];
+        $scoreB = $state['scoreB'];
+        
+        // Game standard: first to 11, win by 2
+        $winningScore = 11;
+        $maxScore = 15; // Cap untuk verifikasi
+        
+        // Cek jika sudah mencapai skor menang dan selisih minimal 2
+        if (($scoreA >= $winningScore || $scoreB >= $winningScore) && abs($scoreA - $scoreB) >= 2) {
+            if ($scoreA > $scoreB) {
+                $state['gamesA']++;
+                $winnerTeam = 'A';
+            } else {
+                $state['gamesB']++;
+                $winnerTeam = 'B';
+            }
+            
+            // Reset scores untuk game berikutnya
+            $state['scoreA'] = 0;
+            $state['scoreB'] = 0;
+            
+            // Cek apakah match sudah dimenangkan (best of 3 games)
+            if ($state['gamesA'] >= 2) {
+                $current['winner'] = 'A';
+                return true;
+            } elseif ($state['gamesB'] >= 2) {
+                $current['winner'] = 'B';
+                return true;
+            }
+            
+            // Jika belum match winner, reset server untuk game baru
+            // Team yang kalah game sebelumnya serve pertama di game berikutnya
+            $state['server'] = $winnerTeam === 'A' ? 'B' : 'A';
+            $state['first_server'] = true;
+            $state['server_number'] = 1;
+            $state['side'] = 'right';
+            
+            return true;
+        }
+        
+        return false;
     }
 }

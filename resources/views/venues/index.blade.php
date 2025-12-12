@@ -8,13 +8,13 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         {{-- FILTER BAR --}}
-        <div class="mb-10 relative z-30">
+        <div class="mb-10 relative z-40">
             <form action="{{ route('venues.index') }}" method="GET" id="filterForm">
 
-                <div class="bg-white p-3 rounded-2xl shadow-lg border border-gray-100 flex flex-col lg:flex-row items-stretch lg:items-center gap-3 relative">
+                <div class="bg-white p-3 rounded-2xl shadow-lg border border-gray-100 flex flex-col lg:flex-row items-stretch lg:items-center gap-3 relative z-40">
 
                     {{-- SEARCH BAR --}}
-                    <div class="flex-grow relative group">
+                    <div class="flex-grow relative group z-40">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <i class="fas fa-search text-gray-400 group-focus-within:text-[#FF6700] transition"></i>
                         </div>
@@ -25,15 +25,15 @@
                                class="w-full pl-11 pr-4 py-3 bg-gray-50 
                                       border-transparent focus:bg-white focus:border-[#FF6700] 
                                       focus:ring-0 rounded-xl text-gray-700 placeholder-gray-400 
-                                      transition duration-200 relative z-10"
+                                      transition duration-200 relative z-40"
                                placeholder="Cari nama venue atau lokasi...">
                     </div>
 
                     <div class="hidden lg:block w-px h-10 bg-gray-200 mx-1"></div>
 
                     {{-- TYPE DROPDOWN --}}
-                    <div class="w-full lg:w-64 relative group">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-20">
+                    <div class="w-full lg:w-64 relative group z-40">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-50">
                             <i class="fas fa-running text-gray-400 group-focus-within:text-[#FF6700] transition"></i>
                         </div>
 
@@ -41,15 +41,15 @@
                                 class="w-full pl-11 pr-10 py-3 bg-gray-50 border-transparent 
                                        focus:bg-white focus:border-[#FF6700] focus:ring-0 rounded-xl 
                                        text-gray-700 appearance-none cursor-pointer transition duration-200 
-                                       relative z-10">
+                                       relative z-40">
                             <option value="">Semua Tipe</option>
-                            <option value="Badminton" {{ request('type') == 'Badminton' ? 'selected' : '' }}>Badminton</option>
-                            <option value="Futsal" {{ request('type') == 'Futsal' ? 'selected' : '' }}>Futsal</option>
-                            <option value="Basket" {{ request('type') == 'Basket' ? 'selected' : '' }}>Basket</option>
-                            <option value="Mini Soccer" {{ request('type') == 'Mini Soccer' ? 'selected' : '' }}>Mini Soccer</option>
+                            <option value="badminton" {{ request('type') == 'badminton' ? 'selected' : '' }}>Badminton</option>
+                            <option value="padel" {{ request('type') == 'padel' ? 'selected' : '' }}>Padel</option>
+                            <option value="pickleball" {{ request('type') == 'pickleball' ? 'selected' : '' }}>Pickleball</option>
+                            <option value="tenis" {{ request('type') == 'tenis' ? 'selected' : '' }}>Tennis</option>
                         </select>
 
-                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none z-20">
+                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none z-50">
                             <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
                         </div>
                     </div>
@@ -57,7 +57,7 @@
                     {{-- PRICE MODAL BUTTON --}}
                     <button type="button" 
                             onclick="toggleModal('priceModal')"
-                            class="relative flex items-center justify-center gap-2 px-4 py-3 
+                            class="relative flex items-center justify-center gap-2 px-4 py-3 z-40 cursor-pointer
                                    {{ request('min_price') || request('max_price') ? 'bg-[#FF6700] text-white' : 'bg-red-50 text-[#FF6700] hover:bg-red-100' }} 
                                    rounded-xl transition duration-200 border border-transparent">
                         <i class="fas fa-sliders-h"></i>
@@ -68,20 +68,20 @@
 
                     {{-- SUBMIT BUTTON --}}
                     <button type="submit"
-                            class="w-full lg:w-auto px-8 py-3 bg-[#FF6700] hover:bg-[#e55d00] text-white font-bold rounded-xl shadow-lg shadow-orange-500/30 transition duration-300 flex items-center justify-center gap-2">
+                            class="w-full lg:w-auto px-8 py-3 bg-[#FF6700] hover:bg-[#e55d00] text-white font-bold rounded-xl shadow-lg shadow-orange-500/30 transition duration-300 flex items-center justify-center gap-2 z-40 cursor-pointer">
                         <i class="fas fa-search text-sm"></i>
                         <span>Cari</span>
                     </button>
                 </div>
 
                 {{-- PRICE MODAL --}}
-                <div id="priceModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                    <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="toggleModal('priceModal')"></div>
+                <div id="priceModal" class="fixed inset-0 z-[9999] hidden pointer-events-none" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                    <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity pointer-events-auto" onclick="toggleModal('priceModal')"></div>
 
-                    <div class="fixed inset-0 z-10 overflow-y-auto">
-                        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                    <div class="fixed inset-0 z-[10000] overflow-y-auto pointer-events-none">
+                        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0 pointer-events-none">
 
-                            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-gray-100">
+                            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-gray-100 pointer-events-auto">
 
                                 {{-- MODAL HEADER --}}
                                 <div class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-between items-center border-b border-gray-100">
@@ -247,8 +247,17 @@
 {{-- JS --}}
 <script>
     function toggleModal(id) {
-        document.getElementById(id).classList.toggle("hidden");
+        const modal = document.getElementById(id);
+        modal.classList.toggle("hidden");
+        
+        // Manage body scroll when modal is open
+        if (!modal.classList.contains("hidden")) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'auto';
+        }
     }
+    
     function clearPrices() {
         document.querySelector('input[name="min_price"]').value = '';
         document.querySelector('input[name="max_price"]').value = '';

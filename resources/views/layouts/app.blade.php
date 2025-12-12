@@ -62,7 +62,7 @@
             top: 0;
             left: 0;
             right: 0;
-            z-index: 1000;
+            z-index: 100;
             padding: 0;
             height: 70px;
             display: flex;
@@ -125,7 +125,7 @@
 
         /* Logo Image Styling */
         .navbar-brand img {
-            height: 1000px;
+            height: 100px;
             width: auto;
             max-width: 200px;
             object-fit: contain;
