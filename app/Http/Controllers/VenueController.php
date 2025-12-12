@@ -15,7 +15,7 @@ class venueController extends Controller
     public function index(Request $request)
     {
         //buat listing semua venue dan handling search dan filter
-        $query = Venue::query()->where('is_active', true);
+        $query = Venue::query();
 
         // Handle Search nama lapangan / lokasi / tipe lapangan
         if ($request->filled('search')) {

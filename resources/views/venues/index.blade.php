@@ -3,144 +3,256 @@
 @section('title', 'Daftar Lapangan')
 
 @section('content')
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Daftar Lapangan</h1>
-        <div>
-            <button class="btn btn-outline-primary me-2">Filter <i class="bi bi-funnel"></i></button>
-            <button class="btn btn-primary">Urutkan: Terdekat</button>
+
+<section class="py-12 bg-gray-50 min-h-screen">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {{-- FILTER BAR --}}
+        <div class="mb-10 relative z-30">
+            <form action="{{ route('venues.index') }}" method="GET" id="filterForm">
+
+                <div class="bg-white p-3 rounded-2xl shadow-lg border border-gray-100 flex flex-col lg:flex-row items-stretch lg:items-center gap-3 relative">
+
+                    {{-- SEARCH BAR --}}
+                    <div class="flex-grow relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <i class="fas fa-search text-gray-400 group-focus-within:text-[#FF6700] transition"></i>
+                        </div>
+
+                        <input type="text" 
+                               name="search" 
+                               value="{{ request('search') }}"
+                               class="w-full pl-11 pr-4 py-3 bg-gray-50 
+                                      border-transparent focus:bg-white focus:border-[#FF6700] 
+                                      focus:ring-0 rounded-xl text-gray-700 placeholder-gray-400 
+                                      transition duration-200 relative z-10"
+                               placeholder="Cari nama venue atau lokasi...">
+                    </div>
+
+                    <div class="hidden lg:block w-px h-10 bg-gray-200 mx-1"></div>
+
+                    {{-- TYPE DROPDOWN --}}
+                    <div class="w-full lg:w-64 relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-20">
+                            <i class="fas fa-running text-gray-400 group-focus-within:text-[#FF6700] transition"></i>
+                        </div>
+
+                        <select name="type"
+                                class="w-full pl-11 pr-10 py-3 bg-gray-50 border-transparent 
+                                       focus:bg-white focus:border-[#FF6700] focus:ring-0 rounded-xl 
+                                       text-gray-700 appearance-none cursor-pointer transition duration-200 
+                                       relative z-10">
+                            <option value="">Semua Tipe</option>
+                            <option value="Badminton" {{ request('type') == 'Badminton' ? 'selected' : '' }}>Badminton</option>
+                            <option value="Futsal" {{ request('type') == 'Futsal' ? 'selected' : '' }}>Futsal</option>
+                            <option value="Basket" {{ request('type') == 'Basket' ? 'selected' : '' }}>Basket</option>
+                            <option value="Mini Soccer" {{ request('type') == 'Mini Soccer' ? 'selected' : '' }}>Mini Soccer</option>
+                        </select>
+
+                        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none z-20">
+                            <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                        </div>
+                    </div>
+
+                    {{-- PRICE MODAL BUTTON --}}
+                    <button type="button" 
+                            onclick="toggleModal('priceModal')"
+                            class="relative flex items-center justify-center gap-2 px-4 py-3 
+                                   {{ request('min_price') || request('max_price') ? 'bg-[#FF6700] text-white' : 'bg-red-50 text-[#FF6700] hover:bg-red-100' }} 
+                                   rounded-xl transition duration-200 border border-transparent">
+                        <i class="fas fa-sliders-h"></i>
+                        <span class="font-medium text-sm whitespace-nowrap">
+                            {{ request('min_price') || request('max_price') ? 'Harga Terfilter' : 'Filter Harga' }}
+                        </span>
+                    </button>
+
+                    {{-- SUBMIT BUTTON --}}
+                    <button type="submit"
+                            class="w-full lg:w-auto px-8 py-3 bg-[#FF6700] hover:bg-[#e55d00] text-white font-bold rounded-xl shadow-lg shadow-orange-500/30 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-search text-sm"></i>
+                        <span>Cari</span>
+                    </button>
+                </div>
+
+                {{-- PRICE MODAL --}}
+                <div id="priceModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+                    <div class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity" onclick="toggleModal('priceModal')"></div>
+
+                    <div class="fixed inset-0 z-10 overflow-y-auto">
+                        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+
+                            <div class="relative transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-gray-100">
+
+                                {{-- MODAL HEADER --}}
+                                <div class="bg-gray-50 px-4 py-3 sm:px-6 flex justify-between items-center border-b border-gray-100">
+                                    <h3 class="text-base font-bold leading-6 text-gray-900" id="modal-title">Filter Range Harga</h3>
+                                    <button type="button" onclick="toggleModal('priceModal')" class="text-gray-400 hover:text-gray-500">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+
+                                {{-- MODAL BODY --}}
+                                <div class="px-4 py-5 sm:p-6 space-y-4">
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Harga Minimum</label>
+                                        <div class="relative rounded-md shadow-sm">
+                                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                <span class="text-gray-500 sm:text-sm">Rp</span>
+                                            </div>
+                                            <input type="number" name="min_price" value="{{ request('min_price') }}"
+                                                   class="block w-full rounded-lg border-gray-300 pl-10 focus:border-[#FF6700] focus:ring-[#FF6700] sm:text-sm py-2.5 bg-gray-50"
+                                                   placeholder="0">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">Harga Maksimum</label>
+                                        <div class="relative rounded-md shadow-sm">
+                                            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                <span class="text-gray-500 sm:text-sm">Rp</span>
+                                            </div>
+                                            <input type="number" name="max_price" value="{{ request('max_price') }}"
+                                                   class="block w-full rounded-lg border-gray-300 pl-10 focus:border-[#FF6700] focus:ring-[#FF6700] sm:text-sm py-2.5 bg-gray-50"
+                                                   placeholder="Tak Terbatas">
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                {{-- MODAL FOOTER --}}
+                                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-2">
+                                    <button type="button" onclick="toggleModal('priceModal')"
+                                            class="inline-flex w-full justify-center rounded-lg bg-[#FF6700] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#e55d00] sm:w-auto">
+                                        Simpan Filter
+                                    </button>
+
+                                    <button type="button" onclick="clearPrices()"
+                                            class="mt-3 inline-flex w-full justify-center rounded-lg bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto">
+                                        Reset Harga
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            {{-- CLEAR FILTERS --}}
+            @if (request('search') || request('type') || request('min_price') || request('max_price'))
+                <div class="mt-4 flex flex-wrap gap-2 animate-fade-in">
+                    <a href="{{ route('venues.index') }}"
+                       class="text-sm text-red-500 hover:text-red-700 hover:underline flex items-center gap-1">
+                        <i class="fas fa-times-circle"></i> Hapus Semua Filter
+                    </a>
+                </div>
+            @endif
         </div>
-    </div>
 
-    <!-- Filter Sidebar & Content -->
-    <div class="row">
-        <div class="col-md-3 mb-4">
-            <div class="card shadow">
-                <div class="card-body">
-                    <h5 class="card-title mb-3">Filter</h5>
-                    
-                    <!-- Jenis Lapangan -->
-                    <div class="mb-4">
-                        <h6 class="mb-2">Jenis Lapangan</h6>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="futsal">
-                            <label class="form-check-label" for="futsal">Futsal</label>
-                        </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="badminton">
-                            <label class="form-check-label" for="badminton">Badminton</label>
-                        </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="basket">
-                            <label class="form-check-label" for="basket">Basket</label>
-                        </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" id="tennis">
-                            <label class="form-check-label" for="tennis">Tennis</label>
-                        </div>
+
+        {{-- SORT BAR --}}
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <p class="text-gray-500 font-medium text-sm md:text-base">
+                Menampilkan <span class="font-bold text-gray-900">{{ count($venues) }} venue</span> tersedia
+            </p>
+
+            <div class="flex items-center gap-2">
+                <span class="text-gray-500 text-sm">Urutan berdasarkan:</span>
+                <div class="relative group">
+                    <button class="flex items-center gap-2 font-bold text-gray-800 bg-white border border-gray-200 px-4 py-2 rounded-lg hover:border-[#FF6700] transition">
+                        Popularitas <i class="fas fa-chevron-down text-xs text-[#FF6700]"></i>
+                    </button>
+
+                    <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-100 hidden group-hover:block z-10">
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-[#FF6700]">Harga Termurah</a>
+                        <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-orange-50 hover:text-[#FF6700]">Rating Tertinggi</a>
                     </div>
-
-                    <!-- Harga -->
-                    <div class="mb-4">
-                        <h6 class="mb-2">Rentang Harga</h6>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="price" id="price1" checked>
-                            <label class="form-check-label" for="price1">Semua Harga</label>
-                        </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="price" id="price2">
-                            <label class="form-check-label" for="price2">≤ Rp 150.000</label>
-                        </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="price" id="price3">
-                            <label class="form-check-label" for="price3">Rp 150.000 - 300.000</label>
-                        </div>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="price" id="price4">
-                            <label class="form-check-label" for="price4">≥ Rp 300.000</label>
-                        </div>
-                    </div>
-
-                    <!-- Jam Operasional -->
-                    <div class="mb-4">
-                        <h6 class="mb-2">Jam Operasional</h6>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text"><i class="bi bi-clock"></i></span>
-                            <input type="time" class="form-control" value="08:00">
-                        </div>
-                        <div class="input-group">
-                            <span class="input-group-text"><i class="bi bi-clock"></i></span>
-                            <input type="time" class="form-control" value="22:00">
-                        </div>
-                    </div>
-
-                    <button class="btn btn-primary w-100 mt-3">Terapkan Filter</button>
                 </div>
             </div>
         </div>
 
-        <!-- List Lapangan -->
-        <div class="col-md-9">
-            <div class="row g-4">
-                @for($i = 1; $i <= 9; $i++)
-                <div class="col-md-6 col-lg-4">
-                    <div class="card card-court h-100">
-                        <div class="position-relative">
-                            <img src="https://images.unsplash.com/photo-{{ ['1518609878373','1546519638','1521412644187'][$i%3] }}?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                                 class="card-img-top" style="height: 180px; object-fit: cover;" alt="Lapangan {{$i}}">
-                            <span class="position-absolute top-0 end-0 m-2 badge {{ $i % 3 == 0 ? 'bg-danger' : 'bg-success' }}">
-                                {{ $i % 3 == 0 ? 'Booked' : 'Available' }}
-                            </span>
+        {{-- VENUE GRID --}}
+        @if ($venues->count() > 0)
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @foreach ($venues as $venue)
+                    <a href="#"
+                       class="group block bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-[#FF6700] transition duration-300 transform hover:-translate-y-1">
+
+                        <div class="relative h-56 bg-gray-200 overflow-hidden">
+                            <img src="{{ $venue->venue_image }}"
+                                 alt="{{ $venue->name }}"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-bold text-[#FF6700] shadow-sm">
+                                {{ $venue->type }}
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <h5 class="card-title mb-0">Lapangan {{$i}}</h5>
-                                    <p class="text-muted mb-0 small">
-                                        <i class="bi bi-geo-alt"></i> Area {{ ['Jakarta','Bandung','Surabaya'][$i%3] }}
-                                    </p>
+
+                        <div class="p-5">
+                            <div class="flex justify-between items-start mb-2">
+                                <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Venue</p>
+                                <div class="flex items-center gap-1 text-xs font-bold text-gray-900 bg-gray-100 px-2 py-1 rounded">
+                                    <i class="fas fa-star text-yellow-400"></i> {{ number_format($venue->rating, 1) }}
                                 </div>
-                                <span class="badge bg-info">{{ ['Futsal','Badminton','Basket'][$i%3] }}</span>
                             </div>
-                            
-                            <div class="rating-stars mb-2">
-                                @for($j = 1; $j <= 5; $j++)
-                                    <i class="bi {{ $j <= rand(3,5) ? 'bi-star-fill' : 'bi-star' }}"></i>
-                                @endfor
-                                <span class="ms-1 small">({{ rand(35,50)/10 }})</span>
-                            </div>
-                            
-                            <p class="card-text small mb-3">
-                                Fasilitas: {{ ['AC, Locker, Toilet','Parkir Luas, Cafe','Lighting LED, Sound System'][$i%3] }}
+
+                            <h3 class="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#FF6700] transition line-clamp-1">
+                                {{ $venue->name }}
+                            </h3>
+
+                            <p class="text-sm text-gray-500 mb-4 flex items-center gap-1">
+                                <i class="fas fa-map-marker-alt text-gray-300"></i> {{ $venue->location }}
                             </p>
-                            
-                            <div class="d-flex justify-content-between align-items-center mt-auto">
-                                <div>
-                                    <h5 class="text-primary mb-0">Rp {{ number_format(100000 + ($i * 30000), 0, ',', '.') }}</h5>
-                                    <small class="text-muted">per jam</small>
+
+                            <div class="border-t border-gray-100 pt-4 flex items-center justify-between">
+                                <div class="flex flex-col">
+                                    <span class="text-xs text-gray-400">Harga Mulai</span>
+                                    <div class="flex items-baseline gap-1">
+                                        <span class="text-lg font-extrabold text-[#FF6700]">
+                                            Rp{{ number_format($venue->price_per_hour, 0, ',', '.') }}
+                                        </span>
+                                        <span class="text-xs text-gray-500">/jam</span>
+                                    </div>
                                 </div>
-                                <a href="/courts/{{$i}}" class="btn btn-primary">Booking</a>
+                                <span class="text-sm font-semibold text-[#FF6700] bg-orange-50 px-3 py-2 rounded-lg group-hover:bg-[#FF6700] group-hover:text-white transition">
+                                    Booking
+                                </span>
                             </div>
                         </div>
-                    </div>
-                </div>
-                @endfor
+                    </a>
+                @endforeach
             </div>
-            
-            <nav class="mt-5">
-                <ul class="pagination justify-content-center">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#">Previous</a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Next</a>
-                    </li>
-                </ul>
-            </nav>
-        </div>
+
+            <div class="mt-12 text-center">
+                <a href="#"
+                   class="inline-flex items-center justify-center px-8 py-3 border border-[#FF6700] text-base font-bold rounded-md text-[#FF6700] bg-white hover:bg-[#FF6700] hover:text-white transition md:py-3 md:text-lg md:px-10">
+                    Lihat Semua Venue
+                </a>
+            </div>
+        @else
+            <div class="text-center py-20">
+                <div class="bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-search text-gray-400 text-3xl"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Lapangan tidak ditemukan</h3>
+                <p class="text-gray-500">Coba ubah kata kunci atau reset filter Anda.</p>
+                <a href="{{ route('venues.index') }}"
+                   class="inline-block mt-4 text-[#FF6700] font-bold hover:underline">Reset Filter</a>
+            </div>
+        @endif
+
     </div>
-</div>
+</section>
+
+{{-- JS --}}
+<script>
+    function toggleModal(id) {
+        document.getElementById(id).classList.toggle("hidden");
+    }
+    function clearPrices() {
+        document.querySelector('input[name="min_price"]').value = '';
+        document.querySelector('input[name="max_price"]').value = '';
+    }
+</script>
+
 @endsection
