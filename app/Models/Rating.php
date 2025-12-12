@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Rating extends Model
 {
@@ -11,6 +12,7 @@ class Rating extends Model
     protected $fillable = [
         'booking_id',
         'user_id',
+        'venue_id',
         'court_id',
         'rating',
         'comment',
@@ -28,6 +30,11 @@ class Rating extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function venue()
+    {
+        return $this->belongsTo(Venue::class);
     }
 
     public function court()

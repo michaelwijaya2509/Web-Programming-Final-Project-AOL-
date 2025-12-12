@@ -16,11 +16,16 @@ return new class extends Migration
 
             $table->foreignId('booking_id')
                 ->constrained()
-                ->onDelete('cascade');
+                ->onDelete('cascade')
+                ->unique();
 
             $table->foreignId('user_id')
                 ->constrained()
                 ->onDelete('cascade');
+
+            $table->foreignId('venue_id')
+                ->constrained()
+                ->onDelete('cascade')->nullable(false);
 
             $table->foreignId('court_id')
                 ->constrained()
@@ -31,9 +36,6 @@ return new class extends Migration
             $table->text('comment')->nullable();
 
             $table->timestamps();
-
-            // optional: cegah double rating per booking
-            $table->unique('booking_id');
         });
     }
 

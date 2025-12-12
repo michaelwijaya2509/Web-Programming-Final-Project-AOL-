@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
-    // menampilkan detail pembayaran
+    // Nampilin halaman payment
     public function show($bookingId)
     {
         $booking = Booking::findOrFail($bookingId);

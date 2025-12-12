@@ -6,17 +6,17 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TransactionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\CourtController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScoreboardController;
+use App\Http\Controllers\venueController;
 
 // Public
 Route::get('/', [HomeController::class, 'index']);
-Route::get('/courts', [CourtController::class, 'index']);
-Route::get('/courts/{id}', [CourtController::class, 'show']);
+Route::get('/venue', [venueController::class, 'index']);
+Route::get('/venue/{id}', [venueController::class, 'show']);
 Route::get('/scoreboard', [ScoreboardController::class, 'index']);
 Route::post('/scoreboard/add-player', [ScoreboardController::class, 'addPlayer']);
 
@@ -31,13 +31,11 @@ Route::get('/scoreboard/leaderboard', [ScoreboardController::class, 'leaderboard
 Route::post('/scoreboard/reset', [ScoreboardController::class, 'reset']);
 
 
-
 // User (auth)
 Route::middleware('auth')->group(function () {
-    Route::get('/booking/create/{court}', [BookingController::class, 'create']);
-    Route::post('/booking', [BookingController::class, 'store']);
+    Route::post('/booking/add-to-cart', [venueController::class, 'addToCart'])->name('booking.addToCart');
+    Route::post('/booking/confirm', [venueController::class, 'confirmBooking'])->name('booking.confirm');
     Route::get('/my-bookings', [BookingController::class, 'myBookings']);
-
     Route::get('/payment/{booking}', [PaymentController::class, 'show']);
     Route::post('/payment/{booking}', [PaymentController::class, 'pay']);
 

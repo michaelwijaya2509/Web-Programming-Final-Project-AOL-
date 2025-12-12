@@ -11,12 +11,12 @@ class BookingSeeder extends Seeder
     {
         Booking::create([
             'user_id'        => 2, // user biasa
+            'venue_id'       => 1,
             'court_id'       => 1,
             'booking_date'   => now()->addDay()->toDateString(),
-            'start_time'     => '19:00',
-            'end_time'       => '21:00',
-            'duration_hour'  => 2,
-            'total_price'    => 150000,
+            'start_time'     => '12:00',
+            'end_time'       => '13:00',
+            'total_price'    => 50000,
             'status'         => 'pending',
         ]);
     }
