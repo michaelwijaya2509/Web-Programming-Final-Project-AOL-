@@ -64,7 +64,7 @@
             right: 0;
             z-index: 1000;
             padding: 0;
-            height: 80px;
+            height: 70px;
             display: flex;
             align-items: center;
             transition: var(--transition);
@@ -72,7 +72,7 @@
 
         .navbar-main.scrolled {
             box-shadow: var(--shadow-md);
-            height: 72px;
+            height: 65px;
         }
 
         .navbar-container {
@@ -101,12 +101,13 @@
         .navbar-brand {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.5rem;
             text-decoration: none;
             color: var(--dark);
             font-weight: 700;
             font-size: 1.5rem;
             white-space: nowrap;
+            padding: 0.5rem 0;
         }
 
         .brand-logo {
@@ -120,6 +121,14 @@
             color: white;
             font-size: 1.25rem;
             flex-shrink: 0;
+        }
+
+        /* Logo Image Styling */
+        .navbar-brand img {
+            height: 1000px;
+            width: auto;
+            max-width: 200px;
+            object-fit: contain;
         }
 
         .brand-name {
@@ -239,10 +248,10 @@
         }
 
         .btn-auth {
-            padding: 0.75rem 1.5rem;
+            padding: 0.6rem 1.25rem;
             border-radius: var(--border-radius);
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.875rem;
             text-decoration: none;
             transition: var(--transition);
             display: flex;
@@ -302,8 +311,8 @@
         }
 
         .user-avatar {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             border-radius: 8px;
             display: flex;
@@ -311,7 +320,7 @@
             justify-content: center;
             color: white;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.9rem;
             flex-shrink: 0;
         }
 
@@ -394,7 +403,7 @@
         .mobile-menu {
             display: none;
             position: fixed;
-            top: 80px;
+            top: 70px;
             left: 0;
             right: 0;
             background: white;
@@ -512,14 +521,19 @@
                 font-size: 1.25rem;
             }
 
+            .navbar-brand img {
+                height: 55px;
+                max-width: 160px;
+            }
+
             .brand-logo {
-                width: 36px;
-                height: 36px;
-                font-size: 1.1rem;
+                width: 32px;
+                height: 32px;
+                font-size: 1rem;
             }
 
             .mobile-menu {
-                top: 72px;
+                top: 65px;
             }
         }
 
@@ -754,9 +768,9 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/courts">
+                            <a class="nav-link" href="/venues">
                                 <i class="bi bi-basket nav-icon"></i>
-                                <span class="nav-text">Courts</span>
+                                <span class="nav-text">Venues</span>
                             </a>
                         </li>
                         <li class="nav-item">
@@ -776,11 +790,6 @@
 
                 <!-- Right Actions -->
                 <div class="nav-right">
-                    <!-- Search Bar -->
-                    <div class="search-wrapper">
-                        <i class="bi bi-search search-icon"></i>
-                        <input type="text" class="search-input" placeholder="Search courts..." aria-label="Search">
-                    </div>
 
                     <!-- Auth Buttons / User Menu -->
                     @auth
@@ -809,12 +818,6 @@
                                     <a class="dropdown-item" href="/my-bookings">
                                         <i class="bi bi-calendar-check"></i>
                                         <span>My Bookings</span>
-                                    </a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="/my-teams">
-                                        <i class="bi bi-people"></i>
-                                        <span>My Teams</span>
                                     </a>
                                 </li>
                                 <li>
