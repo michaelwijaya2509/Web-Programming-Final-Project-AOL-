@@ -11,18 +11,18 @@ use Illuminate\Support\Facades\Auth;
 
 class venueController extends Controller
 {
-    
+
     public function index(Request $request)
     {
         //buat listing semua venue dan handling search dan filter
         $query = Venue::query()->where('is_active', true);
 
         // Handle Search nama lapangan / lokasi / tipe lapangan
-        if($request->filled('search')){
-            $query->where(function ($q) use ($request){
+        if ($request->filled('search')) {
+            $query->where(function ($q) use ($request) {
                 $q->where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('location', 'like', '%' . $request->search . '%')
-                  ->orWhere('type', 'like', '%' . $request->search . '%');
+                    ->orWhere('location', 'like', '%' . $request->search . '%')
+                    ->orWhere('type', 'like', '%' . $request->search . '%');
             });
         }
 
@@ -32,7 +32,8 @@ class venueController extends Controller
 
         if ($request->min_price && $request->max_price) {
             $query->whereBetween('price_per_hour', [
-                $request->min_price, $request->max_price
+                $request->min_price,
+                $request->max_price
             ]);
         }
 
@@ -138,7 +139,7 @@ class venueController extends Controller
                 'booking_date' => $item['date'],
                 'start_time'   => $item['start_time'],
                 'end_time'     => $item['end_time'],
-                'duration_hour'=> 1,
+                'duration_hour' => 1,
                 'total_price'  => $court->price_per_hour,
                 'status'       => 'pending',
             ]);
@@ -151,5 +152,4 @@ class venueController extends Controller
         // Redirect ke halaman payment (bisa satu atau multi booking)
         return redirect()->route('payments.show', ['bookingId' => $bookingIds[0]]);
     }
-
 }
