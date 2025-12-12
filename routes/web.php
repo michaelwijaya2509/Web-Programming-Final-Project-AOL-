@@ -15,7 +15,7 @@ use App\Http\Controllers\venueController;
 
 // Public
 Route::get('/', [HomeController::class, 'index']);
-Route::get('/venue', [venueController::class, 'index']);
+Route::get('/venue', [venueController::class, 'index'])->name('venues.index');
 Route::get('/venue/{id}', [venueController::class, 'show']);
 Route::get('/scoreboard', [ScoreboardController::class, 'index']);
 Route::post('/scoreboard/add-player', [ScoreboardController::class, 'addPlayer']);

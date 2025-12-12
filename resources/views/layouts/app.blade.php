@@ -754,9 +754,9 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="/courts">
+                            <a class="nav-link" href="/venue">
                                 <i class="bi bi-basket nav-icon"></i>
-                                <span class="nav-text">Courts</span>
+                                <span class="nav-text">Venue</span>
                             </a>
                         </li>
                         <li class="nav-item">
