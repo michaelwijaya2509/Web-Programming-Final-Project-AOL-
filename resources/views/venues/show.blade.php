@@ -5,9 +5,9 @@
 @push('styles')
 <style>
     :root {
-        --primary: #2563eb;
-        --primary-dark: #1d4ed8;
-        --primary-light: #3b82f6;
+        --primary: #FF6700;
+        --primary-dark: #E65C00;
+        --primary-light: #FF9F66;
         --secondary: #64748b;
         --accent: #f59e0b;
         --success: #10b981;
@@ -632,49 +632,22 @@
 
 @section('content')
 <div class="court-detail-container">
-    <!-- Breadcrumb -->
-    <div class="container">
-        <div class="breadcrumb-section">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb-custom">
-                    <li class="breadcrumb-item"><a href="/">Home</a></li>
-                    <li class="breadcrumb-item"><a href="/courts">Courts</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Court Details</li>
-                </ol>
-            </nav>
-        </div>
-    </div>
-
     <div class="container">
         <div class="row">
             <!-- Main Content -->
             <div class="col-lg-8">
                 <!-- Image Gallery -->
                 <div class="image-gallery-card">
-                    <div id="courtImages" class="court-carousel carousel slide" data-bs-ride="carousel">
-                        <div class="carousel-inner">
-                            <div class="carousel-item active">
-                                <img src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                                     class="d-block w-100" alt="Court Main View">
-                            </div>
-                            <div class="carousel-item">
-                                <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                                     class="d-block w-100" alt="Court Overview">
-                            </div>
-                            <div class="carousel-item">
-                                <img src="https://images.unsplash.com/photo-1521412644187-c49fa049e84d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
-                                     class="d-block w-100" alt="Court Facilities">
-                            </div>
-                        </div>
-                        <button class="carousel-control-prev" type="button" data-bs-target="#courtImages" data-bs-slide="prev">
-                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Previous</span>
-                        </button>
-                        <button class="carousel-control-next" type="button" data-bs-target="#courtImages" data-bs-slide="next">
-                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                            <span class="visually-hidden">Next</span>
-                        </button>
-                    </div>
+                    @if($venue->venue_image)
+                        <img src="{{ $venue->venue_image }}"
+                                 alt="{{ $venue->name }}"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    @else
+                        <img src="https://images.unsplash.com/photo-1518609878373-06d740f60d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" 
+                             class="d-block w-100" 
+                             alt="Default Court Image"
+                             style="height: 400px; object-fit: cover; border-radius: 12px;">
+                    @endif
                 </div>
 
                 <!-- Court Info -->
@@ -683,22 +656,20 @@
                         <div class="row align-items-start">
                             <div class="col-md-8">
                                 <div class="court-title-section">
-                                    <h1 class="court-title">Premium Futsal Court {{ $courtId ?? 1 }}</h1>
+                                    <h1 class="court-title">{{ $venue->name }}</h1>
                                     <div class="court-location">
                                         <i class="bi bi-geo-alt"></i>
-                                        <span>Sudirman Street No.123, Central Jakarta</span>
+                                        <span>{{ $venue->location }}</span>
                                     </div>
                                     <div class="court-tags">
-                                        <span class="court-tag">Futsal</span>
-                                        <span class="court-tag">Indoor</span>
-                                        <span class="court-tag">Premium</span>
-                                        <span class="court-tag">Air Conditioned</span>
+                                        <span class="court-tag">{{ $venue->type }}</span>
+                                        <span class="court-tag">{{ $venue->space }}</span>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="court-price-section">
-                                    <div class="court-price">Rp 200.000</div>
+                                    <div class="court-price">Rp {{ number_format($venue->price_per_hour, 0, ',', '.') }}</div>
                                     <div class="price-label">per hour (incl. tax)</div>
                                 </div>
                             </div>
@@ -709,14 +680,26 @@
                     <div class="rating-section">
                         <div class="rating-container">
                             <div class="rating-stars">
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-fill"></i>
-                                <i class="bi bi-star-half"></i>
+                                @php
+                                    $avgRating = $venue->averageRating() ?? 0;
+                                    $fullStars = floor($avgRating);
+                                    $hasHalfStar = ($avgRating - $fullStars) >= 0.5;
+                                @endphp
+                                
+                                @for($i = 0; $i < $fullStars; $i++)
+                                    <i class="bi bi-star-fill"></i>
+                                @endfor
+                                
+                                @if($hasHalfStar)
+                                    <i class="bi bi-star-half"></i>
+                                @endif
+                                
+                                @for($i = 0; $i < (5 - $fullStars - ($hasHalfStar ? 1 : 0)); $i++)
+                                    <i class="bi bi-star"></i>
+                                @endfor
                             </div>
-                            <span class="rating-value">4.5</span>
-                            <span class="rating-count">(128 reviews)</span>
+                            <span class="rating-value">{{ number_format($avgRating, 1) }}</span>
+                            <span class="rating-count">({{ $venue->ratings()->count() }} reviews)</span>
                         </div>
                     </div>
 
@@ -724,49 +707,9 @@
                     <div class="description-section">
                         <h3 class="section-title">Description</h3>
                         <p class="court-description">
-                            International standard futsal court featuring the latest synthetic turf for safe gameplay. 
-                            Equipped with 500 lux LED lighting for comfortable night play. Perfect for tournaments 
-                            and casual games.
+                           {{ $venue->description ?? 'No description available for this venue.' }}
                         </p>
-                        
-                        <ul class="features-list">
-                            <li class="feature-item">
-                                <div class="feature-icon">
-                                    <i class="bi bi-rulers"></i>
-                                </div>
-                                <span>Size: 25m × 15m</span>
-                            </li>
-                            <li class="feature-item">
-                                <div class="feature-icon">
-                                    <i class="bi bi-flower1"></i>
-                                </div>
-                                <span>Grade A Synthetic Turf</span>
-                            </li>
-                            <li class="feature-item">
-                                <div class="feature-icon">
-                                    <i class="bi bi-lightbulb"></i>
-                                </div>
-                                <span>500 Lux LED Lighting</span>
-                            </li>
-                            <li class="feature-item">
-                                <div class="feature-icon">
-                                    <i class="bi bi-display"></i>
-                                </div>
-                                <span>Digital Scoreboard</span>
-                            </li>
-                            <li class="feature-item">
-                                <div class="feature-icon">
-                                    <i class="bi bi-droplet"></i>
-                                </div>
-                                <span>Clean Toilet & Shower</span>
-                            </li>
-                            <li class="feature-item">
-                                <div class="feature-icon">
-                                    <i class="bi bi-p-square"></i>
-                                </div>
-                                <span>Parking (50 cars capacity)</span>
-                            </li>
-                        </ul>
+                        </p>
                     </div>
 
                     <!-- Reviews -->
@@ -831,38 +774,43 @@
                 <div class="booking-card">
                     <div class="booking-header">
                         <h3 class="booking-title">Book This Court</h3>
+                        @if(session('booking_cart'))
+                            <span class="badge bg-primary">{{ count(session('booking_cart')) }} in cart</span>
+                        @endif
                     </div>
 
-                    <form id="bookingForm" class="booking-form">
+                    <form action="{{ route('booking.addToCart') }}" method="POST" id="bookingForm" class="booking-form">
+                        @csrf
+                        <input type="hidden" name="venue_id" value="{{ $venue->id }}">
+                        <input type="hidden" name="start_time" id="selectedStartTime">
+                        <input type="hidden" name="end_time" id="selectedEndTime">
+
                         <!-- Date Picker -->
                         <div class="mb-4">
                             <label class="form-label">Select Date</label>
-                            <input type="date" class="form-control-custom" id="bookingDate" required>
+                            <input type="date" 
+                                   class="form-control-custom" 
+                                   name="date"
+                                   id="bookingDate" 
+                                   value="{{ $date }}"
+                                   min="{{ now()->toDateString() }}"
+                                   required
+                                   onchange="this.form.action='{{ route('venues.show', $venue->id) }}'; this.form.method='GET'; this.form.submit();">
                         </div>
 
                         <!-- Time Slots -->
                         <div class="mb-4">
                             <label class="form-label">Choose Time Slot</label>
-                            <div class="time-slots-container">
-                                @php
-                                    $timeSlots = [
-                                        ['time' => '08:00 - 10:00', 'status' => 'available'],
-                                        ['time' => '10:00 - 12:00', 'status' => 'booked'],
-                                        ['time' => '12:00 - 14:00', 'status' => 'available'],
-                                        ['time' => '14:00 - 16:00', 'status' => 'available'],
-                                        ['time' => '16:00 - 18:00', 'status' => 'available'],
-                                        ['time' => '18:00 - 20:00', 'status' => 'available'],
-                                        ['time' => '20:00 - 22:00', 'status' => 'available']
-                                    ];
-                                @endphp
-                                
-                                @foreach($timeSlots as $index => $slot)
-                                <div class="time-slot {{ $slot['status'] === 'booked' ? 'booked' : '' }}" 
+                            <div class="time-slots-container" id="timeSlotsContainer">
+                                @foreach($availableSlots as $index => $slot)
+                                <div class="time-slot {{ !$slot['is_available'] ? 'booked' : '' }}" 
                                      data-slot="{{ $index }}"
-                                     onclick="{{ $slot['status'] !== 'booked' ? "selectTimeSlot(this, {$index})" : '' }}">
-                                    <span class="time-range">{{ $slot['time'] }}</span>
-                                    <span class="slot-status {{ $slot['status'] }}">
-                                        {{ $slot['status'] === 'available' ? 'Available' : 'Booked' }}
+                                     data-start="{{ $slot['start'] }}"
+                                     data-end="{{ $slot['end'] }}"
+                                     onclick="{{ $slot['is_available'] ? "selectTimeSlot(this, '$slot[start]', '$slot[end]')" : '' }}">
+                                    <span class="time-range">{{ $slot['display'] }}</span>
+                                    <span class="slot-status {{ $slot['is_available'] ? 'available' : 'booked' }}">
+                                        {{ $slot['is_available'] ? $slot['available_courts'] . ' Available' : 'Full' }}
                                     </span>
                                 </div>
                                 @endforeach
@@ -872,7 +820,7 @@
                         <!-- Duration -->
                         <div class="mb-4">
                             <label class="form-label">Duration</label>
-                            <select class="form-control-custom" id="duration">
+                            <select class="form-control-custom" id="duration" onchange="updateEndTime()">
                                 <option value="1">1 hour</option>
                                 <option value="2" selected>2 hours</option>
                                 <option value="3">3 hours</option>
@@ -881,34 +829,45 @@
                         </div>
 
                         <!-- Summary -->
-                        <div class="booking-summary">
+                        <div class="booking-summary" id="bookingSummary">
                             <div class="summary-title">Booking Summary</div>
                             <div class="summary-row">
                                 <span>Price per hour</span>
-                                <span>Rp 200.000</span>
+                                <span>Rp {{ number_format($venue->price_per_hour, 0, ',', '.') }}</span>
                             </div>
                             <div class="summary-row">
                                 <span>Duration</span>
-                                <span>2 hours</span>
+                                <span id="durationText">2 hours</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Subtotal</span>
+                                <span id="subtotalText">Rp {{ number_format($venue->price_per_hour * 2, 0, ',', '.') }}</span>
                             </div>
                             <div class="summary-row">
                                 <span>Tax (10%)</span>
-                                <span>Rp 40.000</span>
+                                <span id="taxText">Rp {{ number_format($venue->price_per_hour * 2 * 0.1, 0, ',', '.') }}</span>
                             </div>
                             <div class="summary-row">
                                 <span>Total</span>
-                                <span>Rp 440.000</span>
+                                <span id="totalText">Rp {{ number_format($venue->price_per_hour * 2 * 1.1, 0, ',', '.') }}</span>
                             </div>
                         </div>
 
-                        <!-- Action Button -->
+                        <!-- Action Buttons -->
                         @auth
-                            <button type="submit" class="btn-booking">
-                                <i class="bi bi-calendar-check"></i>
-                                Book Now
+                            <button type="submit" class="btn-booking" id="addToCartBtn" disabled>
+                                <i class="bi bi-cart-plus"></i>
+                                Add to Cart
                             </button>
+                            
+                            @if(session('booking_cart'))
+                                <a href="{{ route('booking.cart') }}" class="btn btn-outline-primary w-100 mt-2">
+                                    <i class="bi bi-cart3"></i>
+                                    View Cart ({{ count(session('booking_cart')) }})
+                                </a>
+                            @endif
                         @else
-                            <a href="/login" class="btn-login">
+                            <a href="{{ route('login') }}" class="btn-login">
                                 <i class="bi bi-box-arrow-in-right"></i>
                                 Login to Book
                             </a>
@@ -930,15 +889,11 @@
                         <ul class="hours-list">
                             <li class="hours-item">
                                 <span class="day">Monday - Friday</span>
-                                <span class="time">08:00 - 22:00</span>
+                                <span class="time">08:00 - 21:00</span>
                             </li>
                             <li class="hours-item">
-                                <span class="day">Saturday</span>
-                                <span class="time">07:00 - 23:00</span>
-                            </li>
-                            <li class="hours-item">
-                                <span class="day">Sunday</span>
-                                <span class="time">07:00 - 22:00</span>
+                                <span class="day">Saturday - Sunday</span>
+                                <span class="time">08:00 - 21:00</span>
                             </li>
                         </ul>
                     </div>
@@ -950,108 +905,64 @@
 
 @push('scripts')
 <script>
-    // Set minimum date to today
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('bookingDate').min = today;
-    document.getElementById('bookingDate').value = today;
-
-    // Time slot selection
-    let selectedSlot = null;
+    const pricePerHour = {{ $venue->price_per_hour }};
+    let selectedStartTime = null;
+    let selectedEndTime = null;
     
-    function selectTimeSlot(element, slotIndex) {
+    function selectTimeSlot(element, startTime, endTime) {
         // Remove previous selection
-        if (selectedSlot !== null) {
-            document.querySelector(`.time-slot[data-slot="${selectedSlot}"]`).classList.remove('selected');
-        }
+        document.querySelectorAll('.time-slot').forEach(slot => {
+            slot.classList.remove('selected');
+        });
         
         // Add new selection
         element.classList.add('selected');
-        selectedSlot = slotIndex;
+        selectedStartTime = startTime;
         
-        // Enable booking button
-        document.querySelector('.btn-booking').disabled = false;
+        // Update hidden inputs
+        document.getElementById('selectedStartTime').value = startTime;
+        
+        // Update end time based on duration
+        updateEndTime();
+        
+        // Enable button
+        document.getElementById('addToCartBtn').disabled = false;
     }
 
-    // Update booking summary when duration changes
-    document.getElementById('duration').addEventListener('change', function() {
-        updateBookingSummary();
-    });
-
-    function updateBookingSummary() {
-        const pricePerHour = 200000;
+    function updateEndTime() {
+        if (!selectedStartTime) return;
+        
         const duration = parseInt(document.getElementById('duration').value);
-        const taxRate = 0.1;
+        const [hours, minutes] = selectedStartTime.split(':');
+        const startHour = parseInt(hours);
+        const endHour = startHour + duration;
         
-        const subtotal = pricePerHour * duration;
-        const tax = subtotal * taxRate;
-        const total = subtotal + tax;
-
-        const summaryElement = document.querySelector('.booking-summary');
-        summaryElement.innerHTML = `
-            <div class="summary-title">Booking Summary</div>
-            <div class="summary-row">
-                <span>Price per hour</span>
-                <span>Rp ${pricePerHour.toLocaleString('id-ID')}</span>
-            </div>
-            <div class="summary-row">
-                <span>Duration</span>
-                <span>${duration} hour${duration > 1 ? 's' : ''}</span>
-            </div>
-            <div class="summary-row">
-                <span>Tax (10%)</span>
-                <span>Rp ${Math.round(tax).toLocaleString('id-ID')}</span>
-            </div>
-            <div class="summary-row">
-                <span>Total</span>
-                <span>Rp ${Math.round(total).toLocaleString('id-ID')}</span>
-            </div>
-        `;
-    }
-
-    // Initialize booking summary
-    updateBookingSummary();
-
-    // Form submission
-    document.getElementById('bookingForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const date = document.getElementById('bookingDate').value;
-        const duration = document.getElementById('duration').value;
-        
-        if (!selectedSlot) {
-            alert('Please select a time slot');
+        // Check if end time exceeds operating hours
+        if (endHour > 21) {
+            alert('Duration exceeds operating hours. Please select earlier time slot or shorter duration.');
             return;
         }
         
-        // Simulate booking process
-        const bookingData = {
-            courtId: {{ $courtId ?? 1 }},
-            date: date,
-            timeSlot: selectedSlot,
-            duration: duration
-        };
+        selectedEndTime = `${String(endHour).padStart(2, '0')}:00`;
+        document.getElementById('selectedEndTime').value = selectedEndTime;
         
-        // Show loading state
-        const btn = document.querySelector('.btn-booking');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
-        btn.disabled = true;
-        
-        // Simulate API call
-        setTimeout(() => {
-            // In real app, redirect to booking confirmation page
-            window.location.href = `/booking/confirm?court=1&date=${date}&duration=${duration}`;
-        }, 1000);
-    });
-
-    // Carousel auto-play
-    const courtCarousel = document.getElementById('courtImages');
-    if (courtCarousel) {
-        new bootstrap.Carousel(courtCarousel, {
-            interval: 4000,
-            wrap: true
-        });
+        updateBookingSummary();
     }
+
+    function updateBookingSummary() {
+        const duration = parseInt(document.getElementById('duration').value);
+        const subtotal = pricePerHour * duration;
+        const tax = subtotal * 0.1;
+        const total = subtotal + tax;
+
+        document.getElementById('durationText').textContent = `${duration} hour${duration > 1 ? 's' : ''}`;
+        document.getElementById('subtotalText').textContent = `Rp ${Math.round(subtotal).toLocaleString('id-ID')}`;
+        document.getElementById('taxText').textContent = `Rp ${Math.round(tax).toLocaleString('id-ID')}`;
+        document.getElementById('totalText').textContent = `Rp ${Math.round(total).toLocaleString('id-ID')}`;
+    }
+
+    // Initialize
+    updateBookingSummary();
 </script>
 @endpush
 @endsection

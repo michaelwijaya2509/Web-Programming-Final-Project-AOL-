@@ -45,111 +45,181 @@ class venueController extends Controller
     // detail venue
     public function show(Request $request, $id)
     {
-        $venue = Venue::findOrFail($id);
-
-        $court = $venue->courts()->where('is_active', true)->get();
+        $venue = Venue::with(['courts', 'ratings.user', 'ratings.booking'])->findOrFail($id);
 
         $date = $request->input('date', now()->toDateString());
 
-        // Mencegah booking di tanggal yang sudah lewat
+        // Prevent booking in the past
         if (Carbon::parse($date)->lt(now()->startOfDay())) {
-            return redirect()->back()->with('error', 'Tanggal tidak boleh kurang dari hari ini.');
+            $date = now()->toDateString();
         }
 
+        // Generate time slots (08:00 - 21:00, 1 hour each)
         $slots = [];
         for ($h = 8; $h < 21; $h++) {
-            $start = sprintf('%02d:00:00', $h);
-            $end = sprintf('%02d:00:00', $h + 1);
+            $startTime = sprintf('%02d:00', $h);
+            $endTime = sprintf('%02d:00', $h + 1);
             $slots[] = [
-                'start' => $start,
-                'end'   => $end,
+                'start' => $startTime,
+                'end' => $endTime,
+                'display' => "$startTime - $endTime"
             ];
         }
 
-        $bookings = Booking::where('booking_date', $date)
-            ->whereNotIn('status', ['cancelled'])
+        // Get all bookings for this date at this venue
+        $bookings = Booking::whereDate('booking_date', $date)
+            ->whereHas('court', function($q) use ($venue) {
+                $q->where('venue_id', $venue->id);
+            })
             ->get()
-            ->groupBy('court_id');
-
-        $courts = $venue->courts->map(function ($court) use ($bookings, $slots, $date) {
-
-            $courtBookings = $bookings->get($court->id, collect());
-
-            $court->slots = collect($slots)->map(function ($slot) use ($courtBookings, $date) {
-
-                // Cek apakah slot sudah dibook atau belum
-                $isBooked = $courtBookings->contains(function ($b) use ($slot) {
-                    return $b->start_time <= $slot['end']
-                        && $b->end_time >= $slot['start'];
-                });
-
-                // memastikan bahwa tidak bisa booking di waktu yang sudah lewat
-                $slotDateTime = Carbon::parse($date . ' ' . $slot['start']);
-
-                $isPastTime = $slotDateTime->lt(now());
-
-                // hasil final
-                $slot['booked'] = $isBooked || $isPastTime;
-
-                return $slot;
+            ->groupBy(function($booking) {
+                return Carbon::parse($booking->start_time)->format('H:i');
             });
 
-            return $court;
-        });
+        // Check availability for each slot
+        $availableSlots = [];
+        foreach ($slots as $slot) {
+            $bookedCount = $bookings->get($slot['start'], collect())->count();
+            $totalCourts = $venue->courts()->where('is_active', true)->count();
+            
+            $availableSlots[] = [
+                'start' => $slot['start'],
+                'end' => $slot['end'],
+                'display' => $slot['display'],
+                'available_courts' => $totalCourts - $bookedCount,
+                'is_available' => ($totalCourts - $bookedCount) > 0
+            ];
+        }
 
-        return view('venues.show', compact('venue', 'courts', 'date', 'slots'));
+        return view('venues.show', compact('venue', 'date', 'availableSlots'));
     }
 
-    // menambahkan slot booking ke keranjang (session)
+    // Add to cart
     public function addToCart(Request $request)
     {
         $request->validate([
-            'court_id' => 'required|integer',
-            'date' => 'required|date',
+            'venue_id' => 'required|exists:venues,id',
+            'date' => 'required|date|after_or_equal:today',
             'start_time' => 'required',
             'end_time' => 'required',
         ]);
 
+        $venue = Venue::findOrFail($request->venue_id);
+        
+        // Calculate duration in hours
+        $start = Carbon::parse($request->date . ' ' . $request->start_time);
+        $end = Carbon::parse($request->date . ' ' . $request->end_time);
+        $duration = $end->diffInHours($start);
+        
+        // Calculate price
+        $pricePerHour = $venue->price_per_hour;
+        $subtotal = $pricePerHour * $duration;
+        $tax = $subtotal * 0.1;
+        $total = $subtotal + $tax;
+
+        // Add to cart session
         $cart = session()->get('booking_cart', []);
-        $cart[] = [
-            'court_id' => $request->court_id,
+        
+        $cartItem = [
+            'venue_id' => $venue->id,
+            'venue_name' => $venue->name,
             'date' => $request->date,
             'start_time' => $request->start_time,
             'end_time' => $request->end_time,
+            'duration' => $duration,
+            'price_per_hour' => $pricePerHour,
+            'subtotal' => $subtotal,
+            'tax' => $tax,
+            'total' => $total,
         ];
+        
+        $cart[] = $cartItem;
         session(['booking_cart' => $cart]);
 
-        return back()->with('success', 'Slot ditambahkan ke keranjang!');
+        return back()->with('success', 'Slot berhasil ditambahkan ke keranjang!');
     }
 
-    public function confirmBooking()
+    // View cart & confirm booking
+    public function viewCart()
     {
         $cart = session('booking_cart', []);
+        
         if (empty($cart)) {
-            return redirect()->back()->with('error', 'Keranjang kosong!');
+            return redirect()->route('venues.index')->with('error', 'Keranjang kosong!');
+        }
+
+        $grandTotal = array_sum(array_column($cart, 'total'));
+        
+        return view('bookings.cart', compact('cart', 'grandTotal'));
+    }
+
+
+    // Confirm & create bookings
+    public function confirmBooking(Request $request)
+    {
+        $cart = session('booking_cart', []);
+        
+        if (empty($cart)) {
+            return redirect()->route('venues.index')->with('error', 'Keranjang kosong!');
         }
 
         $bookingIds = [];
+        
         foreach ($cart as $item) {
-            $court = Court::findOrFail($item['court_id']);
+            // Find available court for this slot
+            $venue = Venue::findOrFail($item['venue_id']);
+            
+            $availableCourt = Court::where('venue_id', $venue->id)
+                ->where('is_active', true)
+                ->whereDoesntHave('bookings', function($q) use ($item) {
+                    $q->where('booking_date', $item['date'])
+                      ->where('start_time', $item['date'] . ' ' . $item['start_time']);
+                })
+                ->first();
+
+            if (!$availableCourt) {
+                session()->forget('booking_cart');
+                return back()->with('error', 'Maaf, slot tidak tersedia lagi untuk ' . $item['date'] . ' ' . $item['start_time']);
+            }
+
+            // Create booking
             $booking = Booking::create([
-                'user_id'      => Auth::id(),
-                'venue_id'     => $court->venue_id,
-                'court_id'     => $court->id,
+                'user_id' => Auth::id(),
+                'venue_id' => $venue->id,
+                'court_id' => $availableCourt->id,
                 'booking_date' => $item['date'],
-                'start_time'   => $item['start_time'],
-                'end_time'     => $item['end_time'],
-                'duration_hour' => 1,
-                'total_price'  => $court->price_per_hour,
-                'status'       => 'pending',
+                'start_time' => $item['date'] . ' ' . $item['start_time'] . ':00',
+                'end_time' => $item['date'] . ' ' . $item['end_time'] . ':00',
+                'total_price' => $item['total'],
+                'status' => 'pending',
             ]);
+
             $bookingIds[] = $booking->id;
         }
 
-        // Kosongkan keranjang
+        // Clear cart
         session()->forget('booking_cart');
 
-        // Redirect ke halaman payment (bisa satu atau multi booking)
-        return redirect()->route('payments.show', ['bookingId' => $bookingIds[0]]);
+        // Redirect to payment with all booking IDs
+        return redirect()->route('payment.show', ['bookings' => implode(',', $bookingIds)])
+            ->with('success', 'Booking berhasil dibuat! Silakan lakukan pembayaran.');
+    }
+
+    // Remove item from cart
+    public function removeFromCart($index)
+    {
+        $cart = session('booking_cart', []);
+        
+        if (isset($cart[$index])) {
+            unset($cart[$index]);
+            $cart = array_values($cart); // Re-index array
+            session(['booking_cart' => $cart]);
+            
+            return back()->with('success', 'Item removed from cart!');
+        }
+        
+        return back()->with('error', 'Item not found in cart.');
     }
 }
+
+

@@ -16,7 +16,7 @@ use App\Http\Controllers\venueController;
 // Public
 Route::get('/', [HomeController::class, 'index']);
 Route::get('/venue', [venueController::class, 'index'])->name('venues.index');
-Route::get('/venue/{id}', [venueController::class, 'show']);
+Route::get('/venue/{id}', [venueController::class, 'show'])->name('venues.show');
 Route::get('/scoreboard', [ScoreboardController::class, 'index']);
 Route::post('/scoreboard/add-player', [ScoreboardController::class, 'addPlayer']);
 
@@ -34,13 +34,17 @@ Route::post('/scoreboard/reset', [ScoreboardController::class, 'reset']);
 // User (auth)
 Route::middleware('auth')->group(function () {
     Route::post('/booking/add-to-cart', [venueController::class, 'addToCart'])->name('booking.addToCart');
+    Route::get('/booking/cart', [venueController::class, 'viewCart'])->name('booking.cart');
+    Route::delete('/booking/cart/{index}', [venueController::class, 'removeFromCart'])->name('booking.removeFromCart');
     Route::post('/booking/confirm', [venueController::class, 'confirmBooking'])->name('booking.confirm');
-    Route::get('/my-bookings', [BookingController::class, 'myBookings']);
-    Route::get('/payment/{booking}', [PaymentController::class, 'show']);
-    Route::post('/payment/{booking}', [PaymentController::class, 'pay']);
+    
+    Route::get('/my-bookings', [BookingController::class, 'myBookings'])->name('my.bookings');
+    Route::get('/payment/{bookings}', [PaymentController::class, 'show'])->name('payment.show');
+    Route::post('/payment/{bookings}', [PaymentController::class, 'pay'])->name('payment.pay');
 
-    Route::get('/rating/{booking}', [RatingController::class, 'create']);
-    Route::post('/rating/{booking}', [RatingController::class, 'store']);
+    Route::get('/rating/{booking}', [RatingController::class, 'create'])->name('rating.create');
+    Route::post('/rating/{booking}', [RatingController::class, 'store'])->name('rating.store');
+    Route::post('/venue/{venue}/rating', [RatingController::class, 'storeFromVenue'])->name('rating.storeFromVenue');
 });
 
 // Admin

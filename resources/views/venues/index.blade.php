@@ -176,7 +176,7 @@
         @if ($venues->count() > 0)
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 @foreach ($venues as $venue)
-                    <a href="#"
+                    <a href="{{ url('/venue/' . $venue->id) }}"
                        class="group block bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl hover:border-[#FF6700] transition duration-300 transform hover:-translate-y-1">
 
                         <div class="relative h-56 bg-gray-200 overflow-hidden">
