@@ -52,7 +52,7 @@ Route::prefix('admin')->middleware(['auth','is_admin'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // Venue & Court Management
-    Route::resource('venues', AdminVenueController::class);
+    Route::resource('/admin-venue', AdminVenueController::class);
     
     // Route Khusus untuk Manage Court di dalam halaman Edit Venue
     Route::post('/venues/{venue}/courts', [AdminVenueController::class, 'storeCourt'])->name('venues.courts.store');
