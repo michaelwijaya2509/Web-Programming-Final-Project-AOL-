@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Carbon\Carbon;
@@ -230,6 +229,49 @@ class venueController extends Controller
         
         return back()->with('error', 'Item not found in cart.');
     }
+
+    // Create single booking and redirect to payment
+    public function createSingleBooking($index)
+    {
+        $cart = session('booking_cart', []);
+        
+        if (!isset($cart[$index])) {
+            return redirect()->route('booking.cart')->with('error', 'Item tidak ditemukan di cart.');
+        }
+
+        $item = $cart[$index];
+        $venue = Venue::findOrFail($item['venue_id']);
+        
+        // Find available court for this slot
+        $availableCourt = Court::where('venue_id', $venue->id)
+            ->where('is_active', true)
+            ->whereDoesntHave('bookings', function($q) use ($item) {
+                $q->where('booking_date', $item['date'])
+                  ->where('start_time', $item['date'] . ' ' . $item['start_time']);
+            })
+            ->first();
+
+        if (!$availableCourt) {
+            return back()->with('error', 'Maaf, slot tidak tersedia lagi untuk ' . $item['date'] . ' ' . $item['start_time']);
+        }
+
+        // Create booking
+        $booking = Booking::create([
+            'user_id' => Auth::id(),
+            'venue_id' => $venue->id,
+            'court_id' => $availableCourt->id,
+            'booking_date' => $item['date'],
+            'start_time' => $item['date'] . ' ' . $item['start_time'] . ':00',
+            'end_time' => $item['date'] . ' ' . $item['end_time'] . ':00',
+            'total_price' => $item['total'],
+            'status' => 'pending',
+        ]);
+
+        // Simpan cart index untuk dihapus nanti setelah payment berhasil
+        session(['pending_cart_index_' . $booking->id => $index]);
+
+        // Redirect to payment (item masih di cart sampai payment berhasil)
+        return redirect()->route('payment.show', $booking->id)
+            ->with('success', 'Booking dibuat! Silakan lakukan pembayaran.');
+    }
 }
-
-

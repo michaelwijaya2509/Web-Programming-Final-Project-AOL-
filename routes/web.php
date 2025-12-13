@@ -80,6 +80,7 @@ Route::middleware(['auth', 'is_user'])->group(function () {
     Route::get('/booking/cart', [venueController::class, 'viewCart'])->name('booking.cart');
     Route::delete('/booking/cart/{index}', [venueController::class, 'removeFromCart'])->name('booking.removeFromCart');
     Route::post('/booking/confirm', [venueController::class, 'confirmBooking'])->name('booking.confirm');
+    Route::post('/booking/create-single/{index}', [venueController::class, 'createSingleBooking'])->name('booking.createSingle');
     
     Route::get('/my-bookings', [BookingController::class, 'myBookings'])->name('my.bookings');
     Route::get('/payment/{bookings}', [PaymentController::class, 'show'])->name('payment.show');
@@ -105,9 +106,6 @@ Route::prefix('admin')->middleware(['auth','is_admin'])->group(function () {
     Route::get('/transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
 });
 
-Route::get('/', [HomeController::class, 'index'])
-    ->middleware(['auth', 'is_user'])
-    ->name('home');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -527,6 +527,17 @@
                                 Rp {{ number_format($item['total'], 0, ',', '.') }}
                             </div>
                         </div>
+
+                        <!-- Pay Now Button per Item -->
+                        <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--gray-200);">
+                            <form action="{{ route('booking.createSingle', $index) }}" method="POST" style="display: block;">
+                                @csrf
+                                <button type="submit" class="confirm-btn" style="margin-top: 0;">
+                                    <i class="fas fa-credit-card"></i>
+                                    <span>Pay This Booking Now</span>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                     @endforeach
                 </div>
@@ -555,15 +566,7 @@
                         <span class="summary-value">Rp {{ number_format($grandTotal, 0, ',', '.') }}</span>
                     </div>
 
-                    <form action="{{ route('booking.confirm') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="confirm-btn">
-                            <i class="bi bi-check-circle"></i>
-                            Confirm & Proceed to Payment
-                        </button>
-                    </form>
-
-                    <a href="{{ route('venues.index') }}" class="continue-shopping">
+                    <a href="{{ route('venues.index') }}" class="continue-shopping" style="margin-top: 20px;">
                         <i class="bi bi-arrow-left"></i>
                         Continue Shopping
                     </a>
@@ -571,7 +574,7 @@
                     <div class="info-box">
                         <i class="bi bi-info-circle info-icon"></i>
                         <div class="info-text">
-                            <strong>Note:</strong> Court will be automatically assigned upon confirmation based on availability.
+                            <strong>Note:</strong> Klik tombol "Pay This Booking Now" pada setiap booking untuk melakukan pembayaran satu per satu. Court akan otomatis di-assign berdasarkan ketersediaan.
                         </div>
                     </div>
                 </div>

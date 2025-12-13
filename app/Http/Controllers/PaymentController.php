@@ -36,6 +36,19 @@ class PaymentController extends Controller
             'status' => 'paid'
         ]);
 
+        // Hapus item dari cart setelah payment berhasil
+        $cartIndex = session('pending_cart_index_' . $booking->id);
+        if ($cartIndex !== null) {
+            $cart = session('booking_cart', []);
+            if (isset($cart[$cartIndex])) {
+                unset($cart[$cartIndex]);
+                $cart = array_values($cart);
+                session(['booking_cart' => $cart]);
+            }
+            // Hapus session cart index
+            session()->forget('pending_cart_index_' . $booking->id);
+        }
+
         return redirect()->route('home')->with('success', 'Pembayaran berhasil! Booking Anda telah dikonfirmasi.');
     }
 }
