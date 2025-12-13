@@ -1,17 +1,18 @@
 <?php
 
-use App\Http\Controllers\Admin\BookingController as AdminBookingController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
-use App\Http\Controllers\Admin\VenueController as AdminVenueController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\venueController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScoreboardController;
-use App\Http\Controllers\venueController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\VenueController as AdminVenueController;
+use App\Http\Controllers\Admin\BookingController as AdminBookingController;
+use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
 
 // Public
 Route::get('/', [HomeController::class, 'index'])->name('home');
