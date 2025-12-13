@@ -86,8 +86,7 @@ Route::middleware(['auth', 'is_user'])->group(function () {
     Route::get('/payment/{bookings}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{bookings}', [PaymentController::class, 'pay'])->name('payment.pay');
 
-    Route::get('/rating/{booking}', [RatingController::class, 'create'])->name('rating.create');
-    Route::post('/rating/{booking}', [RatingController::class, 'store'])->name('rating.store');
+    Route::post('/rating/{booking}', [BookingController::class, 'store'])->name('rating.store');
     Route::post('/venue/{venue}/rating', [RatingController::class, 'storeFromVenue'])->name('rating.storeFromVenue');
 });
 

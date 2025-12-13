@@ -9,24 +9,14 @@ class Booking extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'venue_id',
-        'court_id',
-        'booking_date',
-        'start_time',
-        'end_time',
-        'total_price',
-        'status',
-        'notes',
-    ];
+    protected $fillable = ['user_id', 'venue_id', 'court_id', 'booking_date', 'start_time', 'end_time', 'total_price', 'status', 'notes'];
 
-      protected $casts = [
+    protected $casts = [
         'booking_date' => 'date',
-        'start_time'   => 'datetime:H:i',
-        'end_time'     => 'datetime:H:i',
-        'duration_hour'=> 'decimal:2',
-        'total_price'  => 'decimal:2',
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i',
+        'duration_hour' => 'decimal:2',
+        'total_price' => 'decimal:2',
     ];
 
     public function user()
@@ -38,7 +28,7 @@ class Booking extends Model
     {
         return $this->belongsTo(Venue::class);
     }
-    
+
     public function court()
     {
         return $this->belongsTo(Court::class);
@@ -47,6 +37,11 @@ class Booking extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function rating()
+    {
+        return $this->hasOne(Rating::class);
     }
 
     public function isPaid(): bool
