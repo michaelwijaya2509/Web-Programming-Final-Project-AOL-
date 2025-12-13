@@ -1177,6 +1177,9 @@
         }
     </script>
     @stack('scripts')
+    @auth
+        @include('partials.cart-popup')
+@endauth
 </body>
 
 </html>

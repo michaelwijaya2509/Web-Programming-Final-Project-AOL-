@@ -215,7 +215,17 @@ class venueController extends Controller
             $cart = array_values($cart); // Re-index array
             session(['booking_cart' => $cart]);
             
+            // Return JSON if request is AJAX
+            if (request()->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Item removed from cart!']);
+            }
+            
             return back()->with('success', 'Item removed from cart!');
+        }
+        
+        // Return JSON if request is AJAX
+        if (request()->expectsJson()) {
+            return response()->json(['success' => false, 'message' => 'Item not found in cart.'], 404);
         }
         
         return back()->with('error', 'Item not found in cart.');

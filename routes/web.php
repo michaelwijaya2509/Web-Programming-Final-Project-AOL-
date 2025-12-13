@@ -30,6 +30,48 @@ Route::post('/scoreboard/finish-match', [ScoreboardController::class, 'finishMat
 Route::get('/scoreboard/leaderboard', [ScoreboardController::class, 'leaderboard']);
 Route::post('/scoreboard/reset', [ScoreboardController::class, 'reset']);
 
+// Di routes/web.php, tambahkan route ini
+Route::post('/cart/sync', function(Request $request) {
+    $clientCart = $request->input('cart', []);
+    $serverCart = session('cart', []);
+    
+    // Merge client cart with server cart
+    $mergedCart = array_merge($serverCart, $clientCart);
+    
+    // Remove duplicates by checking unique identifier (venue_id + date + time)
+    $uniqueCart = [];
+    foreach ($mergedCart as $item) {
+        $key = $item['venue_id'] . '_' . $item['date'] . '_' . $item['start_time'];
+        if (!isset($uniqueCart[$key])) {
+            $uniqueCart[$key] = $item;
+        }
+    }
+    
+    // Save to session
+    session(['cart' => array_values($uniqueCart)]);
+    
+    return response()->json([
+        'success' => true,
+        'updatedCart' => array_values($uniqueCart)
+    ]);
+})->name('cart.sync');
+
+Route::post('/cart/save-to-session', function(Request $request) {
+    $cart = $request->input('cart', []);
+    session(['cart' => $cart]);
+    
+    return response()->json(['success' => true]);
+})->name('cart.saveToSession');
+
+// API endpoint untuk get cart data
+Route::get('/api/cart/data', function(Request $request) {
+    $cart = session('booking_cart', []);
+    return response()->json([
+        'success' => true,
+        'cart' => $cart,
+        'count' => count($cart)
+    ]);
+})->middleware('auth')->name('api.cart.data');
 
 // User (auth)
 Route::middleware(['auth', 'is_user'])->group(function () {
