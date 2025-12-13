@@ -5,7 +5,7 @@
 @section('content')
 
 <!-- Hero Section -->
-<div class="relative w-full h-[400px] flex items-center">
+<!-- <div class="relative w-full h-[400px] flex items-center">
     <div class="absolute inset-0 bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 z-0"></div>
     <div class="absolute inset-0 bg-black/30 z-10"></div>
     
@@ -17,6 +17,23 @@
         <p class="text-lg md:text-xl mb-8 max-w-2xl drop-shadow-md text-gray-100">
             Pantau skor secara real-time! Kelola pertandingan dengan sistem scoring otomatis untuk berbagai jenis olahraga.
         </p>
+    </div>
+</div> -->
+<div class="relative w-full h-[400px] flex items-center justify-center overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-tr from-gray-900 via-transparent to-orange-900/40 z-0"></div>
+    
+    <img src="https://plus.unsplash.com/premium_photo-1666913667082-c1fecc45275d?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+        alt="Scoreboard Background" class="absolute inset-0 w-full h-full object-cover filter brightness-[0.4]">
+    
+    <div class="relative z-10 container mx-auto px-6 md:px-12 text-center">
+        <h1 class="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight leading-tight drop-shadow-2xl">
+            Live <br>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6700] to-yellow-400">Scoreboard Manager</span>
+        </h1>
+        
+        <p class="text-lg md:text-2xl text-gray-200 mb-10 max-w-3xl mx-auto font-light leading-relaxed">
+        Pantau skor secara real-time! Kelola pertandingan dengan sistem scoring otomatis untuk berbagai jenis olahraga.
+    </p>
     </div>
 </div>
 
