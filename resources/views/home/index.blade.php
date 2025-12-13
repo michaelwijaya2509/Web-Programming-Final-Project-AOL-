@@ -231,7 +231,7 @@
             <div class="absolute bottom-20 right-10 w-64 h-64 bg-yellow-600 rounded-full blur-[120px] opacity-20"></div>
         </div>
 
-        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
             <div class="text-center mb-10">
                 <span class="text-[#FF6700] font-bold tracking-widest uppercase text-sm">Arena Pilihan</span>
@@ -260,7 +260,7 @@
                             <p class="text-gray-200 text-sm mb-4 line-clamp-2">
                                 Olahraga hits kekinian! Lapangan kaca standar internasional dengan rumput sintetis terbaik.
                             </p>
-                            <a href="{{ url('/venues') }}"
+                            <a href="{{ url('/venues') }}" 
                                 class="inline-block bg-[#FF6700] hover:bg-orange-700 text-white text-xs font-bold py-3 px-6 rounded transition shadow-md">
                                 Booking Now
                             </a>
@@ -344,7 +344,121 @@
                 </div>
 
             </div>
+        </div> -->
+        <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    <div class="text-center mb-10">
+        <span class="text-[#FF6700] font-bold tracking-widest uppercase text-sm">Arena Pilihan</span>
+        <h2 class="text-3xl md:text-5xl font-extrabold text-white mt-2">
+            Sewa Lapangan <span class="text-[#FF6700]">Favoritmu</span>
+        </h2>
+        <p class="text-gray-400 mt-4">Pilih kategori olahraga di bawah ini untuk melihat detail.</p>
+    </div>
+
+    <div class="flex flex-col md:flex-row gap-4 w-full">
+
+        <div class="court-card group">
+            <img src="https://images.unsplash.com/photo-1658723826297-fe4d1b1e6600?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                alt="Padel Court">
+
+            <div class="absolute inset-0 card-gradient z-10"></div>
+
+            <div
+                class="absolute bottom-0 left-0 w-full p-6 z-20 flex flex-col justify-end h-full pointer-events-none">
+                <div class="card-title-box">
+                    <h3 class="text-2xl font-bold text-white uppercase italic tracking-wide">Padel</h3>
+                </div>
+
+                <div class="card-desc pointer-events-auto">
+                    <p class="text-gray-200 text-sm mb-4 line-clamp-2">
+                        Olahraga hits kekinian! Lapangan kaca standar internasional dengan rumput sintetis terbaik.
+                    </p>
+                    <a href="/venue?search=&type=padel&min_price=&max_price=" 
+                        class="inline-block bg-[#FF6700] hover:bg-orange-700 text-white text-xs font-bold py-3 px-6 rounded transition shadow-md">
+                        Booking Now
+                    </a>
+                </div>
+            </div>
         </div>
+
+        <div class="court-card group">
+            <img src="https://plus.unsplash.com/premium_photo-1663045882560-3bdd5f71687c?q=80&w=1976&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                alt="Tennis Court">
+
+            <div class="absolute inset-0 card-gradient z-10"></div>
+
+            <div
+                class="absolute bottom-0 left-0 w-full p-6 z-20 flex flex-col justify-end h-full pointer-events-none">
+                <div class="card-title-box">
+                    <h3 class="text-2xl font-bold text-white uppercase italic tracking-wide">Tennis</h3>
+                </div>
+
+                <div class="card-desc pointer-events-auto">
+                    <p class="text-gray-200 text-sm mb-4 line-clamp-2">
+                        Hard court indoor & outdoor. Permukaan berkualitas untuk pantulan bola yang sempurna.
+                    </p>
+                    <a href="/venue?search=&type=tenis&min_price=&max_price=" 
+                        class="inline-block bg-[#FF6700] hover:bg-orange-700 text-white text-xs font-bold py-3 px-6 rounded transition shadow-md">
+                        Booking Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="court-card group">
+            <img src="https://images.unsplash.com/photo-1521537634581-0dced2fee2ef?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                alt="Badminton Court">
+
+            <div class="absolute inset-0 card-gradient z-10"></div>
+
+            <div
+                class="absolute bottom-0 left-0 w-full p-6 z-20 flex flex-col justify-end h-full pointer-events-none">
+                <div class="card-title-box">
+                    <h3 class="text-2xl font-bold text-white uppercase italic tracking-wide">Badminton</h3>
+                </div>
+
+                <div class="card-desc pointer-events-auto">
+                    <p class="text-gray-200 text-sm mb-4 line-clamp-2">
+                        Karpet standar BWF dengan pencahayaan anti-glare dan sirkulasi udara yang nyaman.
+                    </p>
+                    <a href="/venue?search=&type=badminton&min_price=&max_price=" 
+                        class="inline-block bg-[#FF6700] hover:bg-orange-700 text-white text-xs font-bold py-3 px-6 rounded transition shadow-md">
+                        Booking Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="court-card group">
+            <img src="https://images.unsplash.com/photo-1693142517898-2f986215e412?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                alt="Pickleball Court">
+
+            <div class="absolute inset-0 card-gradient z-10"></div>
+
+            <div
+                class="absolute bottom-0 left-0 w-full p-6 z-20 flex flex-col justify-end h-full pointer-events-none">
+                <div class="card-title-box">
+                    <h3 class="text-2xl font-bold text-white uppercase italic tracking-wide">Pickleball</h3>
+                </div>
+
+                <div class="card-desc pointer-events-auto">
+                    <p class="text-gray-200 text-sm mb-4 line-clamp-2">
+                        Olahraga seru gabungan tenis & pingpong. Lapangan khusus dengan net rendah.
+                    </p>
+                    <a href="/venue?search=&type=pickleball&min_price=&max_price=" 
+                        class="inline-block bg-[#FF6700] hover:bg-orange-700 text-white text-xs font-bold py-3 px-6 rounded transition shadow-md">
+                        Booking Now
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
     </section>
 
     <section class="bg-gray-50 py-20">
