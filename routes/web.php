@@ -14,7 +14,7 @@ use App\Http\Controllers\ScoreboardController;
 use App\Http\Controllers\venueController;
 
 // Public
-Route::get('/', [HomeController::class, 'index']);
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/venue', [venueController::class, 'index'])->name('venues.index');
 Route::get('/venue/{id}', [venueController::class, 'show'])->name('venues.show');
 Route::get('/scoreboard', [ScoreboardController::class, 'index']);
@@ -63,9 +63,9 @@ Route::prefix('admin')->middleware(['auth','is_admin'])->group(function () {
     Route::get('/transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
 });
 
-Route::get('/home.index', function () {
-    return view('home.index')->name('home');
-})->middleware(['auth', 'is_user']);
+Route::get('/', [HomeController::class, 'index'])
+    ->middleware(['auth', 'is_user'])
+    ->name('home');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
