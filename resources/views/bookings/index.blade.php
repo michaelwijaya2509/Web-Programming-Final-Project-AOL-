@@ -26,7 +26,9 @@
                     @php
                         // Cek apakah booking sudah expired (cancelled karena waktu habis)
                         $endTimeOnly = date('H:i:s', strtotime($booking->end_time));
-                        $bookingDateTime = \Carbon\Carbon::parse($booking->booking_date->format('Y-m-d') . ' ' . $endTimeOnly);
+                        $bookingDateTime = \Carbon\Carbon::parse(
+                            $booking->booking_date->format('Y-m-d') . ' ' . $endTimeOnly,
+                        );
                         // Status cancelled DAN waktu sudah lewat = time exceeded
                         $isExpired = $bookingDateTime->lt(now()) && $booking->status == 'cancelled';
                     @endphp
@@ -100,7 +102,7 @@
                                         'cancelled' => 'bg-red-100 text-red-800',
                                         'expired' => 'bg-gray-200 text-gray-700',
                                     ];
-                                    
+
                                     // Tentukan status text
                                     if ($isExpired) {
                                         $statusText = 'Time Exceeded';
@@ -111,8 +113,7 @@
                                     }
                                 @endphp
 
-                                <span
-                                    class="inline-block px-3 py-1 rounded-full text-sm font-bold {{ $statusClass }}">
+                                <span class="inline-block px-3 py-1 rounded-full text-sm font-bold {{ $statusClass }}">
                                     {{ $statusText }}
                                 </span>
                             </div>
@@ -170,8 +171,15 @@
 
                                                     {{-- LOGIKA WAKTU RATING --}}
                                                     @php
-                                                        $endTimeOnlyRating = date('H:i:s', strtotime($booking->end_time));
-                                                        $bookingEndDateTimeRating = \Carbon\Carbon::parse($booking->booking_date->format('Y-m-d') . ' ' . $endTimeOnlyRating);
+                                                        $endTimeOnlyRating = date(
+                                                            'H:i:s',
+                                                            strtotime($booking->end_time),
+                                                        );
+                                                        $bookingEndDateTimeRating = \Carbon\Carbon::parse(
+                                                            $booking->booking_date->format('Y-m-d') .
+                                                                ' ' .
+                                                                $endTimeOnlyRating,
+                                                        );
                                                     @endphp
                                                     @if ($bookingEndDateTimeRating->gt(now()))
                                                         {{-- WARNING: WAKTU BELUM HABIS --}}
@@ -301,17 +309,35 @@
                     cancelButtonText: 'Tidak'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // TODO: Add actual cancel logic here
-                        Swal.fire(
-                            'Dibatalkan!',
-                            'Pemesanan Anda telah dibatalkan.',
-                            'success'
-                        );
+                        // Buat form dinamis dan submit
+                        let form = document.createElement('form');
+                        form.action = `/bookings/${bookingId}/cancel`; // URL route cancel
+                        form.method = 'POST';
+
+                        // Tambahkan CSRF Token
+                        let csrfInput = document.createElement('input');
+                        csrfInput.type = 'hidden';
+                        csrfInput.name = '_token';
+                        csrfInput.value = '{{ csrf_token() }}';
+                        form.appendChild(csrfInput);
+
+                        document.body.appendChild(form);
+                        form.submit();
                     }
                 });
             } else {
+                // Fallback jika SweetAlert tidak load
                 if (confirm("Apakah Anda yakin ingin membatalkan pemesanan ini?")) {
-                    alert("Pembatalan untuk ID " + bookingId + " sedang diproses.");
+                    let form = document.createElement('form');
+                    form.action = `/bookings/${bookingId}/cancel`;
+                    form.method = 'POST';
+                    let csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = '_token';
+                    csrfInput.value = '{{ csrf_token() }}';
+                    form.appendChild(csrfInput);
+                    document.body.appendChild(form);
+                    form.submit();
                 }
             }
         }

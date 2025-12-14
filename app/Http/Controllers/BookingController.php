@@ -57,7 +57,7 @@ class BookingController extends Controller
         // 2. Validasi Waktu - gabungkan tanggal booking dengan waktu end
         $endTimeOnly = date('H:i:s', strtotime($booking->end_time));
         $bookingEndDateTime = \Carbon\Carbon::parse($booking->booking_date->format('Y-m-d') . ' ' . $endTimeOnly);
-        
+
         if ($bookingEndDateTime->gt(now())) {
             return back()->with('error', 'Permainan belum selesai.');
         }
@@ -78,7 +78,25 @@ class BookingController extends Controller
         ]);
 
         // 4. Redirect dengan pesan Sukses
-        
+
         return redirect()->route('my.bookings')->with('success', 'Rating Terkirim!');
+    }
+
+    // Tambahkan method ini di dalam class BookingController
+
+    public function cancel($bookingId)
+    {
+        $booking = Booking::where('id', $bookingId)
+            ->where('user_id', Auth::id()) // Pastikan hanya pemilik yang bisa cancel
+            ->firstOrFail();
+
+        // Validasi: Hanya status 'pending' yang bisa dibatalkan
+        if ($booking->status !== 'pending') {
+            return back()->with('error', 'Pesanan tidak dapat dibatalkan karena status bukan pending.');
+        }
+
+        $booking->update(['status' => 'cancelled']);
+
+        return back()->with('success', 'Pesanan berhasil dibatalkan.');
     }
 }

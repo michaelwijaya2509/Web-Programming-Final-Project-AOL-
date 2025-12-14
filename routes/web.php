@@ -82,6 +82,7 @@ Route::middleware(['auth', 'is_user'])->group(function () {
     Route::delete('/booking/cart/{index}', [venueController::class, 'removeFromCart'])->name('booking.removeFromCart');
     Route::post('/booking/confirm', [venueController::class, 'confirmBooking'])->name('booking.confirm');
     Route::post('/booking/create-single/{index}', [venueController::class, 'createSingleBooking'])->name('booking.createSingle');
+    Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
 
     Route::get('/my-bookings', [BookingController::class, 'myBookings'])->name('my.bookings');
     Route::get('/payment/{bookings}', [PaymentController::class, 'show'])->name('payment.show');
