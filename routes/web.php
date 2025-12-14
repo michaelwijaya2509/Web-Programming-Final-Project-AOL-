@@ -32,13 +32,13 @@ Route::get('/scoreboard/leaderboard', [ScoreboardController::class, 'leaderboard
 Route::post('/scoreboard/reset', [ScoreboardController::class, 'reset']);
 
 // Di routes/web.php, tambahkan route ini
-Route::post('/cart/sync', function(Request $request) {
+Route::post('/cart/sync', function (Request $request) {
     $clientCart = $request->input('cart', []);
     $serverCart = session('cart', []);
-    
+
     // Merge client cart with server cart
     $mergedCart = array_merge($serverCart, $clientCart);
-    
+
     // Remove duplicates by checking unique identifier (venue_id + date + time)
     $uniqueCart = [];
     foreach ($mergedCart as $item) {
@@ -47,25 +47,25 @@ Route::post('/cart/sync', function(Request $request) {
             $uniqueCart[$key] = $item;
         }
     }
-    
+
     // Save to session
     session(['cart' => array_values($uniqueCart)]);
-    
+
     return response()->json([
         'success' => true,
         'updatedCart' => array_values($uniqueCart)
     ]);
 })->name('cart.sync');
 
-Route::post('/cart/save-to-session', function(Request $request) {
+Route::post('/cart/save-to-session', function (Request $request) {
     $cart = $request->input('cart', []);
     session(['cart' => $cart]);
-    
+
     return response()->json(['success' => true]);
 })->name('cart.saveToSession');
 
 // API endpoint untuk get cart data
-Route::get('/api/cart/data', function(Request $request) {
+Route::get('/api/cart/data', function (Request $request) {
     $cart = session('booking_cart', []);
     return response()->json([
         'success' => true,
@@ -81,7 +81,7 @@ Route::middleware(['auth', 'is_user'])->group(function () {
     Route::delete('/booking/cart/{index}', [venueController::class, 'removeFromCart'])->name('booking.removeFromCart');
     Route::post('/booking/confirm', [venueController::class, 'confirmBooking'])->name('booking.confirm');
     Route::post('/booking/create-single/{index}', [venueController::class, 'createSingleBooking'])->name('booking.createSingle');
-    
+
     Route::get('/my-bookings', [BookingController::class, 'myBookings'])->name('my.bookings');
     Route::get('/payment/{bookings}', [PaymentController::class, 'show'])->name('payment.show');
     Route::post('/payment/{bookings}', [PaymentController::class, 'pay'])->name('payment.pay');
@@ -91,12 +91,12 @@ Route::middleware(['auth', 'is_user'])->group(function () {
 });
 
 // Admin
-Route::prefix('admin')->middleware(['auth','is_admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // Venue & Court Management
-    Route::resource('/admin-venue', AdminVenueController::class);
-    
+    Route::resource('/venue', AdminVenueController::class);
+
     // Route Khusus untuk Manage Court di dalam halaman Edit Venue
     Route::post('/venues/{venue}/courts', [AdminVenueController::class, 'storeCourt'])->name('venues.courts.store');
     Route::delete('/courts/{court}', [AdminVenueController::class, 'destroyCourt'])->name('venues.courts.destroy');
@@ -117,11 +117,11 @@ Route::prefix('admin')->middleware(['auth','is_admin'])->group(function () {
 Route::middleware('auth')->group(function () {
     // Profile routes (using Breeze structure)
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-    
+
     // Edit profile (using existing Breeze form)
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    
+
     // New routes for separate pages
     Route::get('/profile/password', [ProfileController::class, 'password'])->name('password.edit');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('password.update');
@@ -129,4 +129,4 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
