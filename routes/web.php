@@ -10,6 +10,7 @@ use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScoreboardController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\VenueController as AdminVenueController;
 use App\Http\Controllers\Admin\BookingController as AdminBookingController;
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
@@ -102,8 +103,17 @@ Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
     Route::delete('/courts/{court}', [AdminVenueController::class, 'destroyCourt'])->name('venues.courts.destroy');
     Route::patch('/courts/{court}/toggle', [AdminVenueController::class, 'toggleCourtStatus'])->name('venues.courts.toggle');
 
+    // Bookings
+    Route::get('/bookings', [AdminBookingController::class, 'index'])->name('bookings.index');
+    Route::get('/bookings/{id}', [AdminBookingController::class, 'show'])->name('bookings.show');
+    Route::post('/bookings/{id}/approve', [AdminBookingController::class, 'approve'])->name('bookings.approve');
+    Route::post('/bookings/{id}/reject', [AdminBookingController::class, 'reject'])->name('bookings.reject');
+
     // Transactions
     Route::get('/transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
+    Route::get('/transactions/{payment}', [AdminTransactionController::class, 'show'])->name('transactions.show');
+
+    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
 });
 
 

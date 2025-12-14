@@ -18,11 +18,8 @@
             --primary-color: #FF6700;
             --primary-hover: #ff8533;
             --sidebar-bg-start: #0f172a;
-            /* Darker Navy */
             --sidebar-bg-end: #1e293b;
-            /* Lighter Navy */
             --glass-bg: rgba(255, 255, 255, 0.7);
-            --glass-border: rgba(255, 255, 255, 0.5);
             --text-main: #334155;
             --bg-body: #f1f5f9;
         }
@@ -41,7 +38,6 @@
             left: 0;
             width: var(--sidebar-width);
             height: 100vh;
-            /* Gradasi Halus untuk kedalaman */
             background: linear-gradient(180deg, var(--sidebar-bg-start) 0%, var(--sidebar-bg-end) 100%);
             color: white;
             z-index: 1000;
@@ -54,7 +50,6 @@
         .sidebar-header {
             padding: 24px;
             background: rgba(0, 0, 0, 0.2);
-            /* Sedikit lebih gelap di header */
         }
 
         .sidebar-brand {
@@ -75,13 +70,11 @@
             font-size: 1.4rem;
             color: white;
             box-shadow: 0 0 15px rgba(255, 103, 0, 0.4);
-            /* Glow Effect */
             transition: transform 0.3s ease;
         }
 
         .sidebar-brand:hover .brand-icon-box {
             transform: rotate(10deg) scale(1.05);
-            /* Animasi ikon saat hover logo */
         }
 
         .brand-text h4 {
@@ -119,22 +112,21 @@
             gap: 12px;
             position: relative;
             overflow: hidden;
+            text-decoration: none;
+            /* Penting untuk button looks like link */
         }
 
-        /* Efek Hover Menu */
         .nav-link:hover {
             color: white;
             background: rgba(255, 255, 255, 0.08);
             transform: translateX(3px);
         }
 
-        /* Active State dengan Glow Orange */
         .nav-link.active {
             background: linear-gradient(90deg, rgba(255, 103, 0, 0.15), transparent);
             color: #FF6700;
             border-left: 3px solid #FF6700;
             border-radius: 4px 12px 12px 4px;
-            /* Unik shape */
         }
 
         .nav-link i {
@@ -145,7 +137,6 @@
         .nav-link.active i {
             color: #FF6700;
             transform: scale(1.1);
-            filter: drop-shadow(0 0 5px rgba(255, 103, 0, 0.5));
         }
 
         /* --- 2. GLASS NAVBAR --- */
@@ -156,8 +147,6 @@
             top: 0;
             z-index: 100;
             transition: all 0.3s ease;
-
-            /* Glassmorphism Effect */
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
@@ -165,14 +154,13 @@
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         }
 
-        /* Search Bar Animasi */
+        /* Search Bar */
         .search-group {
             position: relative;
             width: 280px;
             transition: width 0.4s ease;
         }
 
-        /* Melebar saat fokus */
         .search-group:focus-within {
             width: 380px;
         }
@@ -182,7 +170,6 @@
             border: 1px solid #e2e8f0;
             padding: 10px 10px 10px 45px;
             border-radius: 50px;
-            /* Fully rounded */
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
             transition: all 0.3s;
         }
@@ -202,13 +189,11 @@
             pointer-events: none;
         }
 
-        /* --- 3. MAIN CONTENT ANIMATION --- */
+        /* --- 3. MAIN CONTENT --- */
         .main-content {
             margin-left: var(--sidebar-width);
             padding: 30px;
             min-height: 100vh;
-
-            /* Animasi Masuk */
             animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
@@ -224,7 +209,7 @@
             }
         }
 
-        /* --- 4. INTERACTIVE ELEMENTS --- */
+        /* --- 4. EXTRAS --- */
         .btn-icon-hover {
             width: 40px;
             height: 40px;
@@ -239,7 +224,6 @@
 
         .btn-icon-hover:hover {
             background: #fff0e6;
-            /* Orange muda banget */
             color: #FF6700;
             transform: translateY(-2px);
         }
@@ -271,7 +255,6 @@
             font-weight: 600;
         }
 
-        /* Pulse Animation for Notification */
         .status-dot {
             width: 8px;
             height: 8px;
@@ -280,7 +263,6 @@
             position: absolute;
             top: 10px;
             right: 12px;
-            box-shadow: 0 0 0 rgba(239, 68, 68, 0.4);
             animation: pulse-red 2s infinite;
         }
 
@@ -298,7 +280,6 @@
             }
         }
 
-        /* Responsive */
         @media (max-width: 992px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -316,8 +297,6 @@
             .search-group {
                 display: none;
             }
-
-            /* Sembunyikan search di mobile biar rapi */
         }
     </style>
 
@@ -328,7 +307,7 @@
 
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <a href="{{ url('/') }}" class="sidebar-brand">
+            <a href="{{ url('admin/') }}" class="sidebar-brand">
                 <div class="brand-icon-box">
                     <i class="bi bi-trophy-fill"></i>
                 </div>
@@ -348,16 +327,13 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('admin/bookings*') ? 'active' : '' }}"
                         href="{{ url('/admin/bookings') }}">
                         <i class="bi bi-calendar2-check-fill"></i>
                         <span>Bookings</span>
-                        <span class="badge bg-danger rounded-pill ms-auto" style="font-size: 10px;">New</span>
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('admin/venue*') ? 'active' : '' }}"
                         href="{{ url('/admin/venue') }}">
@@ -365,7 +341,6 @@
                         <span>Venues</span>
                     </a>
                 </li>
-
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('admin/transactions*') ? 'active' : '' }}"
                         href="{{ url('/admin/transactions') }}">
@@ -373,35 +348,22 @@
                         <span>Transactions</span>
                     </a>
                 </li>
-
                 <div class="nav-title mt-4">Lainnya</div>
-
                 <li class="nav-item">
-                    <a class="nav-link {{ Request::is('admin/settings*') ? 'active' : '' }}"
-                        href="{{ url('/admin/settings') }}">
+                    <a class="nav-link {{ Request::is('admin/settings*') ? 'active' : '' }}" href="#">
                         <i class="bi bi-gear-fill"></i>
                         <span>Settings</span>
                     </a>
                 </li>
             </ul>
         </div>
-
-        <div class="p-3 mt-auto border-top border-secondary border-opacity-10">
-            <a href="{{ url('/admin/logout') }}"
-                class="nav-link text-danger hover-danger justify-content-center bg-white bg-opacity-10 rounded-3">
-                <i class="bi bi-box-arrow-right"></i>
-                <span>Logout</span>
-            </a>
-        </div>
     </aside>
 
     <nav class="navbar-admin d-flex justify-content-between align-items-center" id="navbarAdmin">
-
         <div class="d-flex align-items-center gap-4">
             <button class="btn border-0 d-lg-none p-0" id="sidebarToggle">
                 <i class="bi bi-list fs-2 text-dark"></i>
             </button>
-
             <div class="search-group d-none d-md-block">
                 <i class="bi bi-search search-icon"></i>
                 <input type="text" placeholder="Cari booking, nama, atau ID..." aria-label="Search">
@@ -409,7 +371,6 @@
         </div>
 
         <div class="d-flex align-items-center gap-3">
-
             <a href="{{ url('/') }}" class="btn-icon-hover" data-bs-toggle="tooltip" title="Lihat Website">
                 <i class="bi bi-globe2 fs-5"></i>
             </a>
@@ -423,26 +384,7 @@
                     <li>
                         <h6 class="dropdown-header text-uppercase fw-bold text-muted small">Notifikasi</h6>
                     </li>
-                    <li>
-                        <a class="dropdown-item p-2 rounded-3 mb-1 d-flex align-items-start gap-2" href="#">
-                            <div class="bg-primary bg-opacity-10 text-primary rounded p-1"><i class="bi bi-receipt"></i>
-                            </div>
-                            <div>
-                                <div class="fw-bold small">Booking Baru #ORD-99</div>
-                                <div class="text-muted" style="font-size: 11px;">2 menit yang lalu</div>
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item p-2 rounded-3 d-flex align-items-start gap-2" href="#">
-                            <div class="bg-success bg-opacity-10 text-success rounded p-1"><i class="bi bi-cash"></i>
-                            </div>
-                            <div>
-                                <div class="fw-bold small">Pembayaran Diterima</div>
-                                <div class="text-muted" style="font-size: 11px;">10 menit yang lalu</div>
-                            </div>
-                        </a>
-                    </li>
+                    <li><a class="dropdown-item p-2 rounded-3 mb-1" href="#">Booking Baru #ORD-99</a></li>
                 </ul>
             </div>
 
@@ -452,19 +394,27 @@
                 <div class="user-profile-btn d-flex align-items-center gap-2" data-bs-toggle="dropdown">
                     <div class="avatar-circle">A</div>
                     <div class="d-none d-sm-block text-start me-1">
-                        <div class="fw-bold text-dark" style="font-size: 0.85rem; line-height: 1.2;">Admin</div>
-                        <div class="text-muted" style="font-size: 0.7rem;">Superuser</div>
+                        <div class="fw-bold text-dark" style="font-size: 0.85rem; line-height: 1.2;">{{ Auth::user()->name }}</div>
+                        <div class="text-muted" style="font-size: 0.7rem;">Admin</div>
                     </div>
                     <i class="bi bi-chevron-down text-muted" style="font-size: 0.8rem;"></i>
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg p-2 rounded-4 mt-2">
-                    <li><a class="dropdown-item rounded-3" href="#"><i class="bi bi-person me-2"></i>
-                            Profile</a></li>
+                    <li><a class="dropdown-item rounded-3" href="#"><i class="bi bi-person me-2"></i> Profile</a>
+                    </li>
                     <li>
                         <hr class="dropdown-divider">
                     </li>
-                    <li><a class="dropdown-item rounded-3 text-danger" href="#"><i
-                                class="bi bi-box-arrow-right me-2"></i> Logout</a></li>
+                    <li>
+                        {{-- FIXED: Button Logout Navbar (Form langsung) --}}
+                        <form action="{{ route('admin.logout') }}" method="POST">
+                            @csrf
+                            <button type="submit"
+                                class="dropdown-item text-danger rounded-3 w-100 text-start border-0 bg-transparent">
+                                <i class="bi bi-box-arrow-right me-2"></i> Logout
+                            </button>
+                        </form>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -474,17 +424,15 @@
         @yield('content')
     </main>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.35.0"></script>
+    {{-- form id="logout-form" SUDAH DIHAPUS --}}
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Init Tooltip Bootstrap
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl)
         })
 
-        // Sidebar Toggle Logic
         const sidebar = document.getElementById('sidebar');
         const sidebarToggle = document.getElementById('sidebarToggle');
 
@@ -492,7 +440,6 @@
             sidebar.classList.toggle('active');
         });
 
-        // Close Sidebar on Mobile click outside
         document.addEventListener('click', (e) => {
             if (window.innerWidth < 992) {
                 if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {

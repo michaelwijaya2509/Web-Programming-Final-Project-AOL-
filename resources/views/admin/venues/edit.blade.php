@@ -88,7 +88,7 @@
                                 <div class="flex-1">
                                     <label class="block text-xs font-bold text-gray-500 mb-1">Ganti Foto (Opsional)</label>
                                     <input type="file" name="venue_image"
-                                        class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-white file:text-[#FF6700] file:border file:border-[#FF6700] hover:file:bg-orange-50 cursor-pointer">
+                                        class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border file:text-xs file:font-bold file:bg-white file:text-[#FF6700] file:border-[#FF6700] hover:file:bg-orange-50 cursor-pointer">
                                 </div>
                             </div>
                         </div>
