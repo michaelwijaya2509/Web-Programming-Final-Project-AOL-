@@ -23,8 +23,16 @@
         @else
             <div class="space-y-6">
                 @foreach ($bookings as $i => $booking)
+                    @php
+                        // Cek apakah booking sudah expired (cancelled karena waktu habis)
+                        $endTimeOnly = date('H:i:s', strtotime($booking->end_time));
+                        $bookingDateTime = \Carbon\Carbon::parse($booking->booking_date->format('Y-m-d') . ' ' . $endTimeOnly);
+                        // Status cancelled DAN waktu sudah lewat = time exceeded
+                        $isExpired = $bookingDateTime->lt(now()) && $booking->status == 'cancelled';
+                    @endphp
+
                     <div
-                        class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row border border-gray-100 hover:shadow-xl transition duration-300">
+                        class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col md:flex-row border border-gray-100 hover:shadow-xl transition duration-300 {{ $isExpired ? 'opacity-50 grayscale' : '' }}">
 
                         <div class="md:w-64 w-full h-48 md:h-auto flex-shrink-0 relative">
                             {{-- Menggunakan gambar venue dari relasi --}}
@@ -90,19 +98,34 @@
                                         'paid' => 'bg-green-100 text-green-800',
                                         'completed' => 'bg-blue-100 text-blue-800',
                                         'cancelled' => 'bg-red-100 text-red-800',
+                                        'expired' => 'bg-gray-200 text-gray-700',
                                     ];
-                                    $statusText = ucfirst($booking->status);
+                                    
+                                    // Tentukan status text
+                                    if ($isExpired) {
+                                        $statusText = 'Time Exceeded';
+                                        $statusClass = $statusClasses['expired'];
+                                    } else {
+                                        $statusText = ucfirst($booking->status);
+                                        $statusClass = $statusClasses[$booking->status] ?? 'bg-gray-100 text-gray-800';
+                                    }
                                 @endphp
 
                                 <span
-                                    class="inline-block px-3 py-1 rounded-full text-sm font-bold {{ $statusClasses[$booking->status] ?? 'bg-gray-100 text-gray-800' }}">
+                                    class="inline-block px-3 py-1 rounded-full text-sm font-bold {{ $statusClass }}">
                                     {{ $statusText }}
                                 </span>
                             </div>
 
                             <div class="mt-4">
                                 {{-- LOGIKA STATUS BUTTON --}}
-                                @if ($booking->status == 'pending')
+                                @if ($isExpired)
+                                    {{-- JIKA BOOKING SUDAH EXPIRED --}}
+                                    <button disabled
+                                        class="w-full bg-gray-300 text-gray-600 text-sm font-bold py-2 rounded-lg cursor-not-allowed">
+                                        Booking Expired
+                                    </button>
+                                @elseif ($booking->status == 'pending')
                                     <a href="{{ route('payment.show', $booking->id) }}"
                                         class="w-full block text-center bg-[#FF6700] text-white text-sm font-bold py-2 rounded-lg hover:bg-red-800 transition">
                                         Lanjutkan Bayar
@@ -146,14 +169,18 @@
                                                     </div>
 
                                                     {{-- LOGIKA WAKTU RATING --}}
-                                                    @if ($booking->end_time > now())
+                                                    @php
+                                                        $endTimeOnlyRating = date('H:i:s', strtotime($booking->end_time));
+                                                        $bookingEndDateTimeRating = \Carbon\Carbon::parse($booking->booking_date->format('Y-m-d') . ' ' . $endTimeOnlyRating);
+                                                    @endphp
+                                                    @if ($bookingEndDateTimeRating->gt(now()))
                                                         {{-- WARNING: WAKTU BELUM HABIS --}}
                                                         <div class="text-center py-4">
                                                             <div class="text-red-500 text-5xl mb-2">Wait! ✋</div>
                                                             <p class="text-gray-700 font-medium">Anda hanya bisa memberikan
                                                                 rating setelah waktu bermain selesai.</p>
                                                             <p class="text-gray-500 text-sm mt-1">Selesai pada:
-                                                                {{ \Carbon\Carbon::parse($booking->end_time)->format('H:i') }}
+                                                                {{ $bookingEndDateTimeRating->format('d M Y H:i') }}
                                                             </p>
                                                             <button @click="showModal = false"
                                                                 class="mt-6 w-full bg-gray-200 text-gray-800 font-bold py-2 rounded-lg hover:bg-gray-300">
@@ -225,34 +252,68 @@
 @endsection
 
 @push('scripts')
-    {{-- <script>
+    <script>
+        // Pastikan Swal sudah loaded
+        window.addEventListener('load', function() {
+            @if (session('success'))
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Berhasil!',
+                        text: "{{ session('success') }}",
+                        icon: 'success',
+                        confirmButtonColor: '#10b981',
+                        confirmButtonText: 'Oke',
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                } else {
+                    console.error('SweetAlert2 not loaded');
+                    alert("{{ session('success') }}");
+                }
+            @endif
+
+            @if (session('error'))
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Gagal!',
+                        text: "{{ session('error') }}",
+                        icon: 'error',
+                        confirmButtonColor: '#ef4444',
+                        confirmButtonText: 'Oke'
+                    });
+                } else {
+                    console.error('SweetAlert2 not loaded');
+                    alert("{{ session('error') }}");
+                }
+            @endif
+        });
+
         function confirmCancel(bookingId) {
-            if (confirm("Apakah Anda yakin ingin membatalkan pemesanan ini?")) {
-                alert("Pembatalan untuk ID " + bookingId + " sedang diproses.");
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Batalkan Pemesanan?',
+                    text: "Apakah Anda yakin ingin membatalkan pemesanan ini?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Ya, Batalkan',
+                    cancelButtonText: 'Tidak'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // TODO: Add actual cancel logic here
+                        Swal.fire(
+                            'Dibatalkan!',
+                            'Pemesanan Anda telah dibatalkan.',
+                            'success'
+                        );
+                    }
+                });
+            } else {
+                if (confirm("Apakah Anda yakin ingin membatalkan pemesanan ini?")) {
+                    alert("Pembatalan untuk ID " + bookingId + " sedang diproses.");
+                }
             }
         }
-
-        @if (session('success'))
-            alert("Penilaian sudah berhasil ditambahkan");
-        @endif
-
-        @if (session('error'))
-            alert("{{ session('error') }}");
-        @endif
-    </script> --}}
-
-    @if (session('success'))
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                Swal.fire({
-                    title: 'Berhasil!',
-                    text: "{{ session('success') }}",
-                    icon: 'success',
-                    confirmButtonColor: '#3085d6',
-                    confirmButtonText: 'Oke'
-                });
-            });
-        </script>
-    @endif
+    </script>
 @endpush

@@ -12,6 +12,21 @@ class BookingController extends Controller
     // Nampilin semua bookingan kita (history)
     public function myBookings()
     {
+        // Update status booking pending yang sudah expired menjadi cancelled
+        $expiredBookings = Booking::where('user_id', Auth::id())
+            ->where('status', 'pending')
+            ->get()
+            ->filter(function ($booking) {
+                $endTimeOnly = date('H:i:s', strtotime($booking->end_time));
+                $bookingDateTime = \Carbon\Carbon::parse($booking->booking_date->format('Y-m-d') . ' ' . $endTimeOnly);
+                return $bookingDateTime->lt(now());
+            });
+
+        // Update status expired pending bookings menjadi cancelled
+        foreach ($expiredBookings as $expiredBooking) {
+            $expiredBooking->update(['status' => 'cancelled']);
+        }
+
         $bookings = Booking::where('user_id', Auth::id())
             ->with(['venue', 'court'])
             ->latest()
@@ -39,8 +54,11 @@ class BookingController extends Controller
             return back()->with('error', 'Anda sudah memberikan ulasan untuk pesanan ini.');
         }
 
-        // 2. Validasi Waktu
-        if ($booking->end_time > now()) {
+        // 2. Validasi Waktu - gabungkan tanggal booking dengan waktu end
+        $endTimeOnly = date('H:i:s', strtotime($booking->end_time));
+        $bookingEndDateTime = \Carbon\Carbon::parse($booking->booking_date->format('Y-m-d') . ' ' . $endTimeOnly);
+        
+        if ($bookingEndDateTime->gt(now())) {
             return back()->with('error', 'Permainan belum selesai.');
         }
 
