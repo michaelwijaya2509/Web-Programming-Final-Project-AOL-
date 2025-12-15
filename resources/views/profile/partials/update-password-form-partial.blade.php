@@ -1,4 +1,4 @@
-<form method="post" action="{{ route('password.update') }}" class="space-y-6" id="passwordForm">
+<form method="post" action="{{ route('profile.password.update') }}" class="space-y-6" id="passwordForm">
     @csrf
     @method('PUT')
 

@@ -195,7 +195,7 @@
                 <!-- Form Content -->
                 <div class="p-8">
                     <!-- Update Form -->
-                    <form method="post" action="{{ route('password.update') }}" class="space-y-8">
+                    <form method="post" action="{{ route('profile.password.update') }}" class="space-y-8">
                         @csrf
                         @method('put')
 

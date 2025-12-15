@@ -135,7 +135,7 @@ Route::middleware('auth')->group(function () {
 
     // New routes for separate pages
     Route::get('/profile/password', [ProfileController::class, 'password'])->name('password.edit');
-    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('password.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password.update');
     Route::get('/profile/delete', [ProfileController::class, 'delete'])->name('profile.delete');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
