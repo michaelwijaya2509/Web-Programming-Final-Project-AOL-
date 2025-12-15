@@ -1,0 +1,41 @@
+# PHASE 1: Setup - Install PHP 8.3 dan extensions yang dibutuhkan
+[phases.setup]
+nixPkgs = [
+    "php83",                        # PHP versi 8.3
+    "php83Extensions.pdo",          # PDO untuk database
+    "php83Extensions.pdo_pgsql",    # PostgreSQL driver (untuk Supabase)
+    "php83Extensions.mbstring",     # String functions
+    "php83Extensions.tokenizer",    # Tokenizer untuk Laravel
+    "php83Extensions.xml",          # XML parser
+    "php83Extensions.ctype",        # Character type functions
+    "php83Extensions.json",         # JSON functions
+    "php83Extensions.bcmath",       # Math functions
+    "php83Extensions.fileinfo",     # File info detection
+    "php83Extensions.curl"          # cURL untuk HTTP requests (Supabase)
+]
+
+# PHASE 2: Install - Install Composer dependencies
+[phases.install]
+cmds = [
+    "composer install --optimize-autoloader --no-dev --no-scripts --no-interaction"
+]
+# --optimize-autoloader: Optimasi autoload untuk performa
+# --no-dev: Skip testing packages (pest, phpunit, dll)
+# --no-scripts: Skip post-install scripts
+# --no-interaction: Jangan tanya-tanya, otomatis aja
+
+# PHASE 3: Build - Cache config untuk performa
+[phases.build]
+cmds = [
+    "php artisan config:cache",   # Cache semua config files
+    "php artisan route:cache",    # Cache routes untuk performa
+    "php artisan view:cache"      # Cache Blade templates
+]
+
+# PHASE 4: Start - Jalankan aplikasi
+[start]
+cmd = "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=$PORT"
+# migrate --force: Jalankan migrations tanpa konfirmasi
+# serve: Start Laravel development server
+# --host=0.0.0.0: Listen di semua network interfaces
+# --port=$PORT: Gunakan port yang disediakan Railway
