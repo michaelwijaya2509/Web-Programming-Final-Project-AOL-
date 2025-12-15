@@ -8,7 +8,7 @@ use App\Models\Booking;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class venueController extends Controller
+class VenueController extends Controller
 {
 
     public function index(Request $request)
