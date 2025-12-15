@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\venueController;
+use App\Http\Controllers\VenueController;
 use App\Http\Controllers\RatingController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\PaymentController;
@@ -77,11 +77,11 @@ Route::get('/api/cart/data', function (Request $request) {
 
 // User (auth)
 Route::middleware(['auth', 'is_user'])->group(function () {
-    Route::post('/booking/add-to-cart', [venueController::class, 'addToCart'])->name('booking.addToCart');
-    Route::get('/booking/cart', [venueController::class, 'viewCart'])->name('booking.cart');
-    Route::delete('/booking/cart/{index}', [venueController::class, 'removeFromCart'])->name('booking.removeFromCart');
-    Route::post('/booking/confirm', [venueController::class, 'confirmBooking'])->name('booking.confirm');
-    Route::post('/booking/create-single/{index}', [venueController::class, 'createSingleBooking'])->name('booking.createSingle');
+    Route::post('/booking/add-to-cart', [VenueController::class, 'addToCart'])->name('booking.addToCart');
+    Route::get('/booking/cart', [VenueController::class, 'viewCart'])->name('booking.cart');
+    Route::delete('/booking/cart/{index}', [VenueController::class, 'removeFromCart'])->name('booking.removeFromCart');
+    Route::post('/booking/confirm', [VenueController::class, 'confirmBooking'])->name('booking.confirm');
+    Route::post('/booking/create-single/{index}', [VenueController::class, 'createSingleBooking'])->name('booking.createSingle');
     Route::post('/bookings/{booking}/cancel', [BookingController::class, 'cancel'])->name('bookings.cancel');
 
     Route::get('/my-bookings', [BookingController::class, 'myBookings'])->name('my.bookings');
