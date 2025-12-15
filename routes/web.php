@@ -17,8 +17,8 @@ use App\Http\Controllers\Admin\TransactionController as AdminTransactionControll
 
 // Public
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/venue', [venueController::class, 'index'])->name('venues.index');
-Route::get('/venue/{id}', [venueController::class, 'show'])->name('venues.show');
+Route::get('/venue', [VenueController::class, 'index'])->name('venues.index');
+Route::get('/venue/{id}', [VenueController::class, 'show'])->name('venues.show');
 Route::get('/scoreboard', [ScoreboardController::class, 'index']);
 Route::post('/scoreboard/add-player', [ScoreboardController::class, 'addPlayer']);
 
